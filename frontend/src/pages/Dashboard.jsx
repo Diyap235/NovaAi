@@ -14,11 +14,13 @@ function Dashboard() {
 
   useEffect(() => {
     const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-      const user = JSON.parse(currentUser);
-      setUserName(user.firstName);
-    }
-    setTimeout(() => setIsLoading(false), 300);
+    setTimeout(() => {
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        setUserName(user.firstName);
+      }
+      setIsLoading(false);
+    }, 300);
   }, []);
 
   const quickTools = [
