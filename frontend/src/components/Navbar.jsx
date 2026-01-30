@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import logoImg from '../assets/generated/nova-ai-logo-elegant.dim_200x100.png';
 
 /**
  * Navigation bar component for public pages with elegant Nova AI logo.
@@ -16,7 +17,7 @@ function Navbar() {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          <img src="/src/assets/nova-ai-logo-elegant.png" alt="Nova AI" className="logo-image" />
+          <img src={logoImg} alt="Nova AI" className="logo-image" />
         </Link>
         <div className="navbar-links">
           <Link to="/" className="nav-link">Home</Link>

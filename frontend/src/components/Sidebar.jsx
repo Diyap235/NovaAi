@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiHome, FiTool, FiClock, FiUser, FiLogOut } from 'react-icons/fi';
+import logoImg from '../assets/generated/nova-ai-logo-elegant.dim_200x100.png';
 
 /**
  * Sidebar navigation component for dashboard pages.
@@ -24,7 +25,7 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <img src="/src/assets/nova-ai-logo-elegant.png" alt="Nova AI" className="sidebar-logo" />
+        <img src={logoImg} alt="Nova AI" className="sidebar-logo" />
       </div>
       <nav className="sidebar-nav">
         {menuItems.map((item) => {

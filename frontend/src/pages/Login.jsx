@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/auth.css';
+import logoImg from '../assets/generated/nova-ai-logo-elegant.dim_200x100.png';
 
 /**
  * Login page with email/password authentication.
@@ -37,7 +38,7 @@ function Login() {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <img src="/src/assets/nova-ai-logo-elegant.png" alt="Nova AI" className="auth-logo" />
+            <img src={logoImg} alt="Nova AI" className="auth-logo" />
             <h1 className="auth-title">Welcome Back</h1>
             <p className="auth-subtitle">Sign in to continue to Nova AI</p>
           </div>

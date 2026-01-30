@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/auth.css';
+import logoImg from '../assets/generated/nova-ai-logo-elegant.dim_200x100.png';
 
 /**
  * Sign up page for new user registration.
@@ -53,7 +54,7 @@ function Signup() {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <img src="/src/assets/nova-ai-logo-elegant.png" alt="Nova AI" className="auth-logo" />
+            <img src={logoImg} alt="Nova AI" className="auth-logo" />
             <h1 className="auth-title">Create Account</h1>
             <p className="auth-subtitle">Join Nova AI and start writing better</p>
           </div>
@@ -61,32 +62,30 @@ function Signup() {
           <form onSubmit={handleSubmit} className="auth-form">
             {error && <div className="auth-error">{error}</div>}
             
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="firstName" className="form-label">First Name</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="form-input"
-                  placeholder="John"
-                  required
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="firstName" className="form-label">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="form-input"
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
 
-              <div className="form-group">
-                <label htmlFor="lastName" className="form-label">Last Name</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="form-input"
-                  placeholder="Doe"
-                  required
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="lastName" className="form-label">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="form-input"
+                placeholder="Enter your last name"
+                required
+              />
             </div>
 
             <div className="form-group">
@@ -97,7 +96,7 @@ function Signup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="form-input"
-                placeholder="john.doe@example.com"
+                placeholder="Enter your email"
                 required
               />
             </div>

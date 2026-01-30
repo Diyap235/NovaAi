@@ -6,6 +6,21 @@ import { useNavigate } from 'react-router-dom';
 import { FiHeart, FiCheckCircle, FiZap, FiShield, FiUsers } from 'react-icons/fi';
 import '../styles/home.css';
 
+// Import images so Vite bundles them correctly
+import writingToolIcon from '../assets/generated/writing-tool-icon.dim_64x64.png';
+import grammarIcon from '../assets/generated/grammar-icon.dim_64x64.png';
+import paraphraseIcon from '../assets/generated/paraphrase-icon.dim_64x64.png';
+import summaryIcon from '../assets/generated/summary-icon.dim_64x64.png';
+import toneIcon from '../assets/generated/tone-icon.dim_64x64.png';
+import plagiarismIcon from '../assets/generated/plagiarism-icon.dim_64x64.png';
+import citationIcon from '../assets/generated/citation-icon.dim_64x64.png';
+import wordChoiceIcon from '../assets/generated/word-choice-icon.dim_64x64.png';
+import sentenceIcon from '../assets/generated/sentence-icon.dim_64x64.png';
+import readabilityIcon from '../assets/generated/readability-icon.dim_64x64.png';
+import vocabularyIcon from '../assets/generated/vocabulary-icon.dim_64x64.png';
+import styleGuideIcon from '../assets/generated/style-guide-icon.dim_64x64.png';
+import aiBrainHero from '../assets/generated/ai-brain-hero.dim_800x400.png';
+
 /**
  * Enhanced home page with hero, features, advantages, testimonials, and how it works sections.
  */
@@ -13,78 +28,18 @@ function Home() {
   const navigate = useNavigate();
 
   const features = [
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/writing-tool-icon.dim_64x64.png',
-      title: 'AI Writing Assistant',
-      description: 'Enhance your writing with intelligent suggestions and improvements.',
-      color: '#a855f7'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/grammar-icon.dim_64x64.png',
-      title: 'Grammar Checker',
-      description: 'Detect and fix grammar mistakes instantly with AI precision.',
-      color: '#ec4899'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/paraphrase-icon.dim_64x64.png',
-      title: 'Paraphrasing Tool',
-      description: 'Rewrite content while maintaining original meaning and context.',
-      color: '#8b5cf6'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/summary-icon.dim_64x64.png',
-      title: 'Text Summarizer',
-      description: 'Generate concise summaries from long-form content instantly.',
-      color: '#d946ef'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/tone-icon.dim_64x64.png',
-      title: 'Tone Analyzer',
-      description: 'Adjust your writing tone to match your audience perfectly.',
-      color: '#c026d3'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/plagiarism-icon.dim_64x64.png',
-      title: 'Plagiarism Detector',
-      description: 'Ensure originality with advanced plagiarism detection.',
-      color: '#a855f7'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/citation-icon.dim_64x64.png',
-      title: 'Citation Generator',
-      description: 'Create accurate citations in multiple formats effortlessly.',
-      color: '#9333ea'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/word-choice-icon.dim_64x64.png',
-      title: 'Word Choice Enhancer',
-      description: 'Find better words and phrases to elevate your writing.',
-      color: '#7c3aed'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/sentence-icon.dim_64x64.png',
-      title: 'Sentence Restructure',
-      description: 'Improve sentence flow and clarity with AI recommendations.',
-      color: '#6d28d9'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/readability-icon.dim_64x64.png',
-      title: 'Readability Score',
-      description: 'Analyze and improve content readability for your audience.',
-      color: '#5b21b6'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/vocabulary-icon.dim_64x64.png',
-      title: 'Vocabulary Builder',
-      description: 'Expand your vocabulary with contextual word suggestions.',
-      color: '#7e22ce'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/style-guide-icon.dim_64x64.png',
-      title: 'Style Guide',
-      description: 'Maintain consistency with customizable style guidelines.',
-      color: '#86198f'
-    }
+    { icon: writingToolIcon, title: 'AI Writing Assistant', description: 'Enhance your writing with intelligent suggestions and improvements.', color: '#a855f7' },
+    { icon: grammarIcon, title: 'Grammar Checker', description: 'Detect and fix grammar mistakes instantly with AI precision.', color: '#ec4899' },
+    { icon: paraphraseIcon, title: 'Paraphrasing Tool', description: 'Rewrite content while maintaining original meaning and context.', color: '#8b5cf6' },
+    { icon: summaryIcon, title: 'Text Summarizer', description: 'Generate concise summaries from long-form content instantly.', color: '#d946ef' },
+    { icon: toneIcon, title: 'Tone Analyzer', description: 'Adjust your writing tone to match your audience perfectly.', color: '#c026d3' },
+    { icon: plagiarismIcon, title: 'Plagiarism Detector', description: 'Ensure originality with advanced plagiarism detection.', color: '#a855f7' },
+    { icon: citationIcon, title: 'Citation Generator', description: 'Create accurate citations in multiple formats effortlessly.', color: '#9333ea' },
+    { icon: wordChoiceIcon, title: 'Word Choice Enhancer', description: 'Find better words and phrases to elevate your writing.', color: '#7c3aed' },
+    { icon: sentenceIcon, title: 'Sentence Restructure', description: 'Improve sentence flow and clarity with AI recommendations.', color: '#6d28d9' },
+    { icon: readabilityIcon, title: 'Readability Score', description: 'Analyze and improve content readability for your audience.', color: '#5b21b6' },
+    { icon: vocabularyIcon, title: 'Vocabulary Builder', description: 'Expand your vocabulary with contextual word suggestions.', color: '#7e22ce' },
+    { icon: styleGuideIcon, title: 'Style Guide', description: 'Maintain consistency with customizable style guidelines.', color: '#86198f' }
   ];
 
   const advantages = [
@@ -135,30 +90,10 @@ function Home() {
   ];
 
   const howItWorksSteps = [
-    {
-      number: 1,
-      title: 'Sign Up & Get Started',
-      description: 'Create your free account in seconds and access all Nova AI tools.',
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/writing-tool-icon.dim_64x64.png'
-    },
-    {
-      number: 2,
-      title: 'Choose Your Tool',
-      description: 'Select from our comprehensive suite of AI-powered writing tools.',
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/grammar-icon.dim_64x64.png'
-    },
-    {
-      number: 3,
-      title: 'Input Your Content',
-      description: 'Paste or type your text and let our AI analyze your writing.',
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/paraphrase-icon.dim_64x64.png'
-    },
-    {
-      number: 4,
-      title: 'Get Instant Results',
-      description: 'Receive AI-powered suggestions and improvements in real-time.',
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/summary-icon.dim_64x64.png'
-    }
+    { number: 1, title: 'Sign Up & Get Started', description: 'Create your free account in seconds and access all Nova AI tools.', icon: writingToolIcon },
+    { number: 2, title: 'Choose Your Tool', description: 'Select from our comprehensive suite of AI-powered writing tools.', icon: grammarIcon },
+    { number: 3, title: 'Input Your Content', description: 'Paste or type your text and let our AI analyze your writing.', icon: paraphraseIcon },
+    { number: 4, title: 'Get Instant Results', description: 'Receive AI-powered suggestions and improvements in real-time.', icon: summaryIcon }
   ];
 
   return (
@@ -185,7 +120,7 @@ function Home() {
           </div>
         </div>
         <div className="hero-image">
-          <img src="https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/ai-brain-hero.dim_800x400.png" alt="AI Brain" />
+          <img src={aiBrainHero} alt="AI Brain" />
         </div>
       </section>
 

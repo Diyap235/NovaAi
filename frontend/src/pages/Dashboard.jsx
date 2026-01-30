@@ -5,6 +5,12 @@ import { useEffect, useState } from 'react';
 import { FiClock, FiTrendingUp } from 'react-icons/fi';
 import '../styles/dashboard.css';
 
+import writingToolIcon from '../assets/generated/writing-tool-icon.dim_64x64.png';
+import grammarIcon from '../assets/generated/grammar-icon.dim_64x64.png';
+import paraphraseIcon from '../assets/generated/paraphrase-icon.dim_64x64.png';
+import summaryIcon from '../assets/generated/summary-icon.dim_64x64.png';
+import toneIcon from '../assets/generated/tone-icon.dim_64x64.png';
+
 /**
  * Main dashboard page with Quick AI Tools, Recent Activity, and Productivity Stats.
  */
@@ -24,57 +30,17 @@ function Dashboard() {
   }, []);
 
   const quickTools = [
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/writing-tool-icon.dim_64x64.png',
-      title: 'AI Writing Assistant',
-      description: 'Enhance your writing with intelligent suggestions.',
-      color: '#a855f7'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/grammar-icon.dim_64x64.png',
-      title: 'Grammar Checker',
-      description: 'Detect and fix grammar mistakes instantly.',
-      color: '#ec4899'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/paraphrase-icon.dim_64x64.png',
-      title: 'Paraphrasing Tool',
-      description: 'Rewrite content while maintaining meaning.',
-      color: '#8b5cf6'
-    },
-    {
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/summary-icon.dim_64x64.png',
-      title: 'Text Summarizer',
-      description: 'Generate concise summaries instantly.',
-      color: '#d946ef'
-    }
+    { icon: writingToolIcon, title: 'AI Writing Assistant', description: 'Enhance your writing with intelligent suggestions.', color: '#a855f7' },
+    { icon: grammarIcon, title: 'Grammar Checker', description: 'Detect and fix grammar mistakes instantly.', color: '#ec4899' },
+    { icon: paraphraseIcon, title: 'Paraphrasing Tool', description: 'Rewrite content while maintaining meaning.', color: '#8b5cf6' },
+    { icon: summaryIcon, title: 'Text Summarizer', description: 'Generate concise summaries instantly.', color: '#d946ef' }
   ];
 
   const recentActivity = [
-    {
-      tool: 'Grammar Checker',
-      time: '2 hours ago',
-      status: 'Completed',
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/grammar-icon.dim_64x64.png'
-    },
-    {
-      tool: 'Paraphrasing Tool',
-      time: '5 hours ago',
-      status: 'Completed',
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/paraphrase-icon.dim_64x64.png'
-    },
-    {
-      tool: 'Text Summarizer',
-      time: 'Yesterday',
-      status: 'Completed',
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/summary-icon.dim_64x64.png'
-    },
-    {
-      tool: 'Tone Analyzer',
-      time: '2 days ago',
-      status: 'Completed',
-      icon: 'https://incredible-sapphire-zob-draft.caffeine.xyz/assets/generated/tone-icon.dim_64x64.png'
-    }
+    { tool: 'Grammar Checker', time: '2 hours ago', status: 'Completed', icon: grammarIcon },
+    { tool: 'Paraphrasing Tool', time: '5 hours ago', status: 'Completed', icon: paraphraseIcon },
+    { tool: 'Text Summarizer', time: 'Yesterday', status: 'Completed', icon: summaryIcon },
+    { tool: 'Tone Analyzer', time: '2 days ago', status: 'Completed', icon: toneIcon }
   ];
 
   if (isLoading) {
