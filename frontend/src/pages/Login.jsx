@@ -26,7 +26,11 @@ function Login() {
     const user = users.find((u) => u.email === email && u.password === password);
 
     if (user) {
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      const userWithStats = {
+        ...user,
+        stats: user.stats ?? { toolsUsed: 0, wordsProcessed: 0, lastActive: user.createdAt || new Date().toISOString() }
+      };
+      localStorage.setItem('currentUser', JSON.stringify(userWithStats));
       navigate('/dashboard');
     } else {
       setError('Invalid email or password');

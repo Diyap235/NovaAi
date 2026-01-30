@@ -41,7 +41,8 @@ function Signup() {
       lastName,
       email,
       password,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      stats: { toolsUsed: 0, wordsProcessed: 0, lastActive: new Date().toISOString() }
     };
 
     users.push(newUser);
