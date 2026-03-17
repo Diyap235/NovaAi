@@ -1,54 +1,45 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import '../styles/auth.css';
 import logoImg from '../assets/generated/nova-ai-logo-elegant.dim_200x100.png';
 
-/**
- * Sign up page for new user registration.
- */
 function Signup() {
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { signup } = useAuth();
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', password: '' });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setError('');
 
+    const { firstName, lastName, email, password } = form;
+
     if (!firstName || !lastName || !email || !password) {
-      setError('All fields are required');
+      setError('All fields are required.');
       return;
     }
-
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Password must be at least 6 characters.');
       return;
     }
 
-    const usersData = localStorage.getItem('users');
-    const users = usersData ? JSON.parse(usersData) : [];
-
-    if (users.some((u) => u.email === email)) {
-      setError('Email already registered');
-      return;
+    setIsLoading(true);
+    const result = await signup(firstName, lastName, email, password);
+    setIsLoading(false);
+    if (result.success) {
+      navigate('/login');
+    } else {
+      setError(result.error);
     }
-
-    const newUser = {
-      firstName,
-      lastName,
-      email,
-      password,
-      createdAt: new Date().toISOString(),
-      stats: { toolsUsed: 0, wordsProcessed: 0, lastActive: new Date().toISOString() }
-    };
-
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    navigate('/login');
-  };
+  }, [form, signup, navigate]);
 
   return (
     <div className="auth-page">
@@ -61,18 +52,20 @@ function Signup() {
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
-            {error && <div className="auth-error">{error}</div>}
-            
+            {error && <div className="auth-error" role="alert">{error}</div>}
+
             <div className="form-group">
               <label htmlFor="firstName" className="form-label">First Name</label>
               <input
                 type="text"
                 id="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                name="firstName"
+                value={form.firstName}
+                onChange={handleChange}
                 className="form-input"
                 placeholder="Enter your first name"
                 required
+                autoComplete="given-name"
               />
             </div>
 
@@ -81,11 +74,13 @@ function Signup() {
               <input
                 type="text"
                 id="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                name="lastName"
+                value={form.lastName}
+                onChange={handleChange}
                 className="form-input"
                 placeholder="Enter your last name"
                 required
+                autoComplete="family-name"
               />
             </div>
 
@@ -94,11 +89,13 @@ function Signup() {
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                value={form.email}
+                onChange={handleChange}
                 className="form-input"
                 placeholder="Enter your email"
                 required
+                autoComplete="email"
               />
             </div>
 
@@ -107,16 +104,18 @@ function Signup() {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
                 className="form-input"
                 placeholder="At least 6 characters"
                 required
+                autoComplete="new-password"
               />
             </div>
 
-            <button type="submit" className="auth-button">
-              Create Account
+            <button type="submit" className="auth-button" disabled={isLoading}>
+              {isLoading ? 'Creating account...' : 'Create Account'}
             </button>
           </form>
 

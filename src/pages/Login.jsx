@@ -1,41 +1,33 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import '../styles/auth.css';
 import logoImg from '../assets/generated/nova-ai-logo-elegant.dim_200x100.png';
 
-/**
- * Login page with email/password authentication.
- */
 function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { login } = useAuth();
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setError('');
-
-    const usersData = localStorage.getItem('users');
-    if (!usersData) {
-      setError('No account found. Please sign up first.');
-      return;
-    }
-
-    const users = JSON.parse(usersData);
-    const user = users.find((u) => u.email === email && u.password === password);
-
-    if (user) {
-      const userWithStats = {
-        ...user,
-        stats: user.stats ?? { toolsUsed: 0, wordsProcessed: 0, lastActive: user.createdAt || new Date().toISOString() }
-      };
-      localStorage.setItem('currentUser', JSON.stringify(userWithStats));
+    setIsLoading(true);
+    const result = await login(form.email, form.password);
+    setIsLoading(false);
+    if (result.success) {
       navigate('/dashboard');
     } else {
-      setError('Invalid email or password');
+      setError(result.error);
     }
-  };
+  }, [form, login, navigate]);
 
   return (
     <div className="auth-page">
@@ -48,18 +40,20 @@ function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
-            {error && <div className="auth-error">{error}</div>}
-            
+            {error && <div className="auth-error" role="alert">{error}</div>}
+
             <div className="form-group">
               <label htmlFor="email" className="form-label">Email</label>
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                value={form.email}
+                onChange={handleChange}
                 className="form-input"
                 placeholder="Enter your email"
                 required
+                autoComplete="email"
               />
             </div>
 
@@ -68,21 +62,23 @@ function Login() {
               <input
                 type="password"
                 id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
                 className="form-input"
                 placeholder="Enter your password"
                 required
+                autoComplete="current-password"
               />
             </div>
 
-            <button type="submit" className="auth-button">
-              Sign In
+            <button type="submit" className="auth-button" disabled={isLoading}>
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
           <div className="auth-footer">
-            <p>Don't have an account? <Link to="/signup" className="auth-link">Sign Up</Link></p>
+            <p>Don&apos;t have an account? <Link to="/signup" className="auth-link">Sign Up</Link></p>
           </div>
         </div>
       </div>
