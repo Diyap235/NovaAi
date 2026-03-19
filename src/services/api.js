@@ -65,18 +65,47 @@ export const apiDeleteAllDrafts = () => request('/drafts', { method: 'DELETE' })
 
 // ─── AI Tools ─────────────────────────────────────────────────────────────────
 
+// Response shape from backend: { success, tool, result, ...meta }
 const callTool = (endpoint, body) =>
-  request(endpoint, { method: 'POST', body: JSON.stringify(body) }).then((r) => r.data.processedText);
+  request(endpoint, { method: 'POST', body: JSON.stringify(body) }).then((r) => r.result);
 
-export const improveWriting     = (text, opts = {}) => callTool('/tools/writing-assistant', { text, ...opts });
-export const checkGrammar       = (text)             => callTool('/tools/grammar-check',    { text });
-export const paraphraseText     = (text, opts = {})  => callTool('/tools/paraphrase',       { text, ...opts });
-export const summarizeText      = (text, opts = {})  => callTool('/tools/summarize',        { text, ...opts });
-export const analyzeTone        = (text)             => callTool('/tools/tone-analyze',     { text });
-export const detectPlagiarism   = (text)             => callTool('/tools/plagiarism',       { text });
-export const generateCitation   = (fields)           => callTool('/tools/citation',         fields);
-export const enhanceWordChoice  = (text)             => callTool('/tools/word-enhance',     { text });
-export const restructureSentences = (text)           => callTool('/tools/restructure',      { text });
-export const scoreReadability   = (text)             => callTool('/tools/readability',      { text });
-export const buildVocabulary    = (text)             => callTool('/tools/vocabulary',       { text });
-export const applyStyleGuide    = (text, opts = {})  => callTool('/tools/style-guide',      { text, ...opts });
+// Formats an object result into a readable string for ToolOutput display
+const formatObject = (obj) => JSON.stringify(obj, null, 2);
+
+// AI generative tools — result is always a plain string
+export const improveWriting       = (text, opts = {}) => callTool('/tools/enhance',         { text, ...opts });
+export const paraphraseText       = (text, opts = {}) => callTool('/tools/paraphrase',      { text, ...opts });
+export const humanizeText         = (text, opts = {}) => callTool('/tools/humanize',        { text, ...opts });
+export const restructureSentences = (text, opts = {}) => callTool('/tools/restructure',     { text, ...opts });
+// Tone Analyzer uses NLP sentiment endpoint — no AI
+export const analyzeTone = (text) =>
+  callTool('/tools/sentiment', { text }).then((r) => {
+    if (typeof r === 'string') return r;
+    const { tone, sentiment: s } = r;
+    return [
+      `Tone: ${tone.tone} (${tone.confidence} confidence)`,
+      `Sentiment: ${s.label} (score: ${s.comparative})`,
+      ``,
+      `Positive words: ${s.positive.length ? s.positive.join(', ') : 'none'}`,
+      `Negative words: ${s.negative.length ? s.negative.join(', ') : 'none'}`,
+    ].join('\n');
+  });
+export const applyStyleGuide      = (text, opts = {}) => callTool('/tools/style',           { text, ...opts });
+export const enhanceWordChoice    = (text, opts = {}) => callTool('/tools/enhance',         { text, ...opts });
+export const buildVocabulary      = (text, opts = {}) => callTool('/tools/vocabulary',      { text, ...opts });
+
+// Hybrid tools — NLP by default, AI only when explicitly opted in
+export const summarizeText    = (text, opts = {}) => callTool('/tools/summarize',   { text, ...opts });
+export const checkGrammar     = (text, opts = {}) => callTool('/tools/grammar',     { text, ...opts });
+export const scoreReadability = (text, opts = {}) => callTool('/tools/readability', { text, ...opts });
+
+// Plagiarism — routed to AI enhance with plagiarism-specific prompt via vocabulary route
+export const detectPlagiarism = (text) => callTool('/tools/plagiarism', { text });
+
+// NLP analytical tools — result is an object, formatted for display
+export const getKeywordDensity = (text)           =>
+  callTool('/tools/keyword-density', { text }).then(formatObject);
+export const getSimilarity     = (text1, text2)   =>
+  callTool('/tools/similarity',      { text1, text2 }).then(formatObject);
+export const getSentiment      = (text)           =>
+  callTool('/tools/sentiment',       { text }).then(formatObject);

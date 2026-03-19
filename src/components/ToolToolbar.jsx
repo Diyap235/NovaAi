@@ -19,7 +19,7 @@ function ToolToolbar({ result, onRegenerate, onSave, toolName = 'nova-ai-result'
       <ShareButton text={result} title={toolName} />
 
       <button
-        onClick={onRegenerate}
+        onClick={() => onRegenerate()}
         className="tool-action-btn"
         title="Regenerate result"
       >

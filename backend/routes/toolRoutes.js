@@ -1,36 +1,35 @@
 const express = require('express');
 const {
-  aiWritingAssistant,
-  grammarChecker,
-  paraphraseText,
-  summarizeText,
-  toneAnalyzer,
-  plagiarismCheck,
-  citationGenerator,
-  wordChoiceEnhancer,
-  sentenceRestructure,
-  readabilityScore,
-  vocabularyBuilder,
-  styleGuide,
+  paraphrase, humanize, enhance, restructure, toneRewrite, styleRewrite,
+  vocabulary, plagiarism,
+  keywordDensity, similarity, sentiment,
+  summarize, grammar, readability,
 } = require('../controllers/toolController');
 const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// All tool routes require authentication
+// All tool routes require a valid JWT
 router.use(protect);
 
-router.post('/writing-assistant',  aiWritingAssistant);
-router.post('/grammar-check',      grammarChecker);
-router.post('/paraphrase',         paraphraseText);
-router.post('/summarize',          summarizeText);
-router.post('/tone-analyze',       toneAnalyzer);
-router.post('/plagiarism',         plagiarismCheck);
-router.post('/citation',           citationGenerator);
-router.post('/word-enhance',       wordChoiceEnhancer);
-router.post('/restructure',        sentenceRestructure);
-router.post('/readability',        readabilityScore);
-router.post('/vocabulary',         vocabularyBuilder);
-router.post('/style-guide',        styleGuide);
+// ── AI Tools (generative) ─────────────────────────────────────────────────────
+router.post('/paraphrase',      paraphrase);
+router.post('/humanize',        humanize);
+router.post('/enhance',         enhance);
+router.post('/restructure',     restructure);
+router.post('/tone',            toneRewrite);
+router.post('/style',           styleRewrite);
+router.post('/vocabulary',      vocabulary);
+router.post('/plagiarism',      plagiarism);
+
+// ── NLP Tools (analytical) ───────────────────────────────────────────────────
+router.post('/keyword-density', keywordDensity);
+router.post('/similarity',      similarity);
+router.post('/sentiment',       sentiment);
+
+// ── Hybrid Tools (NLP first → AI fallback) ───────────────────────────────────
+router.post('/summarize',       summarize);
+router.post('/grammar',         grammar);
+router.post('/readability',     readability);
 
 module.exports = router;

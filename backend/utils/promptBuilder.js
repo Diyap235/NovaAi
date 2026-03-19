@@ -1,0 +1,124 @@
+/**
+ * promptBuilder.js — Prompt Engineering Layer
+ *
+ * Builds structured, mode-aware prompts for every AI-powered tool.
+ * Each prompt enforces: human-like output, meaning preservation, tone control,
+ * and anti-AI-detection patterns.
+ *
+ * Usage: buildPrompt(type, text, mode)
+ *
+ * Supported types: paraphrase | grammar | summarize | tone | humanize | enhance
+ *                  restructure | readability | vocabulary | style
+ * Supported modes: formal | casual | academic | creative
+ */
+
+// ─── Mode descriptors injected into prompts ───────────────────────────────────
+const MODE_DESCRIPTORS = {
+  formal:   'formal, professional, and polished',
+  casual:   'casual, conversational, and friendly',
+  academic: 'academic, precise, and scholarly with discipline-appropriate vocabulary',
+  creative: 'creative, expressive, and engaging with vivid language',
+};
+
+const getMode = (mode) => MODE_DESCRIPTORS[mode] || MODE_DESCRIPTORS.formal;
+
+// ─── Shared output rules appended to every prompt ────────────────────────────
+const OUTPUT_RULES = `
+Rules:
+- Output ONLY the result. No explanations, labels, or meta-commentary.
+- Write naturally as a human would. Avoid robotic or formulaic phrasing.
+- Do not start sentences with "Certainly", "Sure", "Of course", or similar filler.
+- Preserve the original meaning and intent.
+- Vary sentence structure to avoid repetition.`;
+
+// ─── Individual prompt builders ───────────────────────────────────────────────
+
+const prompts = {
+  paraphrase: (text, mode) =>
+    `Rewrite the following text in a ${getMode(mode)} style. ` +
+    `Rephrase every sentence using different vocabulary and structure while keeping the exact meaning intact.\n` +
+    OUTPUT_RULES +
+    `\n\nOriginal Text:\n${text}\n\nRewritten Text:`,
+
+  grammar: (text, mode) =>
+    `Correct all grammar, spelling, punctuation, and syntax errors in the following text. ` +
+    `Maintain a ${getMode(mode)} tone. Do not change the meaning or restructure ideas.\n` +
+    OUTPUT_RULES +
+    `\n\nText:\n${text}\n\nCorrected Text:`,
+
+  summarize: (text, mode) =>
+    `Write a concise, high-quality summary of the following text in a ${getMode(mode)} style. ` +
+    `Capture all key points, arguments, and conclusions. Reduce length by at least 60%.\n` +
+    OUTPUT_RULES +
+    `\n\nText:\n${text}\n\nSummary:`,
+
+  tone: (text, mode) =>
+    `Rewrite the following text so its tone becomes ${getMode(mode)}. ` +
+    `Adjust word choice, sentence rhythm, and formality level accordingly. Preserve all original information.\n` +
+    OUTPUT_RULES +
+    `\n\nOriginal Text:\n${text}\n\nTone-Adjusted Text:`,
+
+  humanize: (text, mode) =>
+    `Rewrite the following text to sound completely human-written in a ${getMode(mode)} style. ` +
+    `Remove any robotic, repetitive, or AI-generated patterns. Add natural flow, varied sentence length, ` +
+    `and authentic voice. The result must pass AI-detection tools.\n` +
+    OUTPUT_RULES +
+    `\n\nText:\n${text}\n\nHumanized Text:`,
+
+  enhance: (text, mode) =>
+    `Enhance the following text to make it more compelling, clear, and impactful in a ${getMode(mode)} style. ` +
+    `Improve word choice, sentence structure, and overall quality without changing the core message.\n` +
+    OUTPUT_RULES +
+    `\n\nOriginal Text:\n${text}\n\nEnhanced Text:`,
+
+  restructure: (text, mode) =>
+    `Restructure the sentences in the following text to improve logical flow, clarity, and readability ` +
+    `in a ${getMode(mode)} style. Eliminate passive voice where possible. Keep all original information.\n` +
+    OUTPUT_RULES +
+    `\n\nText:\n${text}\n\nRestructured Text:`,
+
+  readability: (text, mode) =>
+    `Rewrite the following text to significantly improve its readability in a ${getMode(mode)} style. ` +
+    `Use shorter sentences, simpler vocabulary where appropriate, and clear paragraph structure. ` +
+    `Target a broad audience without dumbing down the content.\n` +
+    OUTPUT_RULES +
+    `\n\nText:\n${text}\n\nImproved Text:`,
+
+  vocabulary: (text, mode) =>
+    `Enhance the vocabulary in the following text by replacing weak, overused, or generic words ` +
+    `with stronger, more precise alternatives appropriate for a ${getMode(mode)} style. ` +
+    `Do not change sentence structure — only upgrade word choices.\n` +
+    OUTPUT_RULES +
+    `\n\nText:\n${text}\n\nVocabulary-Enhanced Text:`,
+
+  plagiarism: (text, _mode) =>
+    `Analyze the following text for originality. Identify any phrases, sentences, or patterns that ` +
+    `appear generic, formulaic, or likely copied from common sources. ` +
+    `Provide: (1) an estimated originality score out of 100, (2) flagged phrases with reasons, ` +
+    `(3) a brief recommendation to improve originality.\n` +
+    OUTPUT_RULES +
+    `\n\nText:\n${text}\n\nOriginality Analysis:`,
+
+  style: (text, mode) =>
+    `Rewrite the following text to fully conform to a ${getMode(mode)} writing style. ` +
+    `Adjust tone, formality, sentence construction, and vocabulary to match the style consistently throughout.\n` +
+    OUTPUT_RULES +
+    `\n\nText:\n${text}\n\nStyled Text:`,
+};
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+/**
+ * Builds a structured prompt for the given tool type.
+ * @param {string} type  - Tool type (e.g. "paraphrase", "grammar")
+ * @param {string} text  - Input text from user
+ * @param {string} mode  - Writing mode: formal | casual | academic | creative
+ * @returns {string}     - Complete prompt string ready for AI
+ */
+const buildPrompt = (type, text, mode = 'formal') => {
+  const builder = prompts[type];
+  if (!builder) throw new Error(`Unknown prompt type: "${type}". Supported: ${Object.keys(prompts).join(', ')}`);
+  return builder(text, mode);
+};
+
+module.exports = { buildPrompt };
