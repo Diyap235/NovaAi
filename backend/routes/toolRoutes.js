@@ -1,7 +1,7 @@
 const express = require('express');
 const {
   paraphrase, humanize, enhance, restructure, toneRewrite, styleRewrite,
-  vocabulary, plagiarism,
+  vocabulary, plagiarism, citation,
   keywordDensity, similarity, sentiment,
   summarize, grammar, readability,
 } = require('../controllers/toolController');
@@ -20,12 +20,13 @@ router.post('/restructure',     restructure);
 router.post('/tone',            toneRewrite);
 router.post('/style',           styleRewrite);
 router.post('/vocabulary',      vocabulary);
-router.post('/plagiarism',      plagiarism);
 
 // ── NLP Tools (analytical) ───────────────────────────────────────────────────
 router.post('/keyword-density', keywordDensity);
 router.post('/similarity',      similarity);
 router.post('/sentiment',       sentiment);
+router.post('/plagiarism',      plagiarism);
+router.post('/citation',        citation);
 
 // ── Hybrid Tools (NLP first → AI fallback) ───────────────────────────────────
 router.post('/summarize',       summarize);

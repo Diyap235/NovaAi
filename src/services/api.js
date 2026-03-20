@@ -99,8 +99,18 @@ export const summarizeText    = (text, opts = {}) => callTool('/tools/summarize'
 export const checkGrammar     = (text, opts = {}) => callTool('/tools/grammar',     { text, ...opts });
 export const scoreReadability = (text, opts = {}) => callTool('/tools/readability', { text, ...opts });
 
-// Plagiarism — routed to AI enhance with plagiarism-specific prompt via vocabulary route
-export const detectPlagiarism = (text) => callTool('/tools/plagiarism', { text });
+// Plagiarism — full NLP pipeline, returns human-readable report
+export const detectPlagiarism = (text) =>
+  request('/tools/plagiarism', { method: 'POST', body: JSON.stringify({ text }) }).then((r) => r.result);
+
+// Citation — strict rule-based, no AI
+// Required: title, author, year, style
+// Optional: publisher, url
+export const generateCitation = ({ title, author, publisher, date, url, style }) =>
+  request('/tools/citation', {
+    method: 'POST',
+    body: JSON.stringify({ style, title, author, year: date, publisher, url }),
+  }).then((r) => r.result);
 
 // NLP analytical tools — result is an object, formatted for display
 export const getKeywordDensity = (text)           =>

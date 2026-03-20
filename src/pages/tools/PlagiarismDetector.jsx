@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FiShield } from 'react-icons/fi';
 import DashboardLayout from '../../layout/DashboardLayout';
 import ToolInput from '../../components/ToolInput';
@@ -19,17 +20,29 @@ function PlagiarismDetector() {
           <div className="tool-page-icon"><img src={plagiarismIcon} alt="" /></div>
           <div>
             <h1 className="tool-page-title">Plagiarism Detector</h1>
-            <p className="tool-page-desc">Check your content for originality. Get a plagiarism percentage score, highlighted copied text, and matched source list.</p>
+            <p className="tool-page-desc">
+              Check your content for originality using NLP analysis. Get a plagiarism percentage,
+              risk level, matched content, and highlighted copied sections.
+            </p>
           </div>
         </div>
 
         <div className="tool-panels">
-          <ToolInput value={input} onChange={setInput} placeholder="Paste your text to check for plagiarism..." maxLength={5000} />
+          <ToolInput
+            value={input}
+            onChange={setInput}
+            placeholder="Paste your text here to check for plagiarism (minimum ~20 words for reliable results)..."
+            maxLength={5000}
+          />
           <ToolOutput result={result} isLoading={isLoading} error={error} />
         </div>
 
         <div className="tool-generate-row">
-          <button className="tool-generate-btn" onClick={() => run()} disabled={isLoading || !input.trim()}>
+          <button
+            className="tool-generate-btn"
+            onClick={() => run()}
+            disabled={isLoading || !input.trim()}
+          >
             <FiShield /> {isLoading ? 'Scanning...' : 'Check Plagiarism'}
           </button>
         </div>

@@ -34,7 +34,8 @@ export function useToolState(toolName, apiFn) {
 
   const handleSave = useCallback(() => {
     if (!result) return;
-    saveToHistory({ tool: toolName, input, result });
+    const resultStr = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
+    saveToHistory({ tool: toolName, input, result: resultStr });
   }, [toolName, input, result]);
 
   const clearAll = useCallback(() => {

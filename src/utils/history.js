@@ -5,14 +5,19 @@ export function saveToHistory({ tool, input, result }) {
   try {
     const raw     = localStorage.getItem('novaHistory');
     const history = raw ? JSON.parse(raw) : [];
+
+    // Safely convert result to string regardless of type
+    const resultStr = typeof result === 'string'
+      ? result
+      : JSON.stringify(result, null, 2);
+
     history.unshift({
       id:        Date.now(),
       tool,
-      input:     input.slice(0, 200),   // store a preview only
-      result:    result.slice(0, 500),
+      input:     (input || '').slice(0, 200),
+      result:    resultStr.slice(0, 500),
       createdAt: new Date().toISOString(),
     });
-    // Keep last 100 entries
     localStorage.setItem('novaHistory', JSON.stringify(history.slice(0, 100)));
   } catch {
     // Storage quota exceeded or unavailable — silently ignore

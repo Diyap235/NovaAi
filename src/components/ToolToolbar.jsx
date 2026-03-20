@@ -1,17 +1,18 @@
-import { FiRefreshCw, FiSave } from 'react-icons/fi';
+import { useState } from 'react';
+import { FiRefreshCw, FiSave, FiCheck } from 'react-icons/fi';
 import CopyButton from './CopyButton';
 import DownloadButton from './DownloadButton';
 import ShareButton from './ShareButton';
 
-/**
- * Action toolbar rendered below every tool result panel.
- * Props:
- *   result      — the output text (enables/disables buttons)
- *   onRegenerate — callback to re-run the AI call
- *   onSave       — callback to save result to history
- *   toolName     — used as the download filename
- */
 function ToolToolbar({ result, onRegenerate, onSave, toolName = 'nova-ai-result' }) {
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    onSave();
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   return (
     <div className="tool-toolbar">
       <CopyButton text={result} />
@@ -22,19 +23,20 @@ function ToolToolbar({ result, onRegenerate, onSave, toolName = 'nova-ai-result'
         onClick={() => onRegenerate()}
         className="tool-action-btn"
         title="Regenerate result"
+        disabled={!result}
       >
         <FiRefreshCw />
         <span>Regenerate</span>
       </button>
 
       <button
-        onClick={onSave}
+        onClick={handleSave}
         className="tool-action-btn"
         title="Save to history"
         disabled={!result}
       >
-        <FiSave />
-        <span>Save</span>
+        {saved ? <FiCheck style={{ color: 'var(--color-success, #22c55e)' }} /> : <FiSave />}
+        <span>{saved ? 'Saved!' : 'Save'}</span>
       </button>
     </div>
   );

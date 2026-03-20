@@ -3,7 +3,6 @@ import { FiBookOpen } from 'react-icons/fi';
 import DashboardLayout from '../../layout/DashboardLayout';
 import ToolOutput from '../../components/ToolOutput';
 import ToolToolbar from '../../components/ToolToolbar';
-import { useToolState } from '../../hooks/useToolState';
 import { generateCitation } from '../../services/api';
 import citationIcon from '../../assets/generated/citation-icon.dim_64x64.png';
 import '../../styles/dashboard.css';
@@ -18,16 +17,22 @@ function CitationGenerator() {
   const [date,      setDate]      = useState('');
   const [url,       setUrl]       = useState('');
 
-  const apiFn = useCallback(
-    () => generateCitation({ title, author, publisher, date, url, style }),
-    [title, author, publisher, date, url, style]
-  );
+  const [result,    setResult]    = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error,     setError]     = useState('');
 
-  // Citation generator doesn't use a text input — override run to pass empty string
-  const { result, isLoading, error, run, regenerate, handleSave } =
-    useToolState('Citation Generator', apiFn);
-
-  const handleGenerate = useCallback(() => run(), [run]);
+  const handleGenerate = useCallback(async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const output = await generateCitation({ title, author, publisher, date, url, style });
+      setResult(output);
+    } catch (err) {
+      setError(err?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [title, author, publisher, date, url, style]);
 
   const inputField = (label, value, setter, type = 'text', placeholder = '') => (
     <div className="tool-setting-group">
@@ -68,22 +73,26 @@ function CitationGenerator() {
             ))}
           </div>
           <div className="tool-settings-grid">
-            {inputField('Title',     title,     setTitle,     'text', 'Article or book title')}
-            {inputField('Author',    author,    setAuthor,    'text', 'Last, First')}
-            {inputField('Publisher', publisher, setPublisher, 'text', 'Publisher name')}
-            {inputField('Date',      date,      setDate,      'text', 'YYYY')}
-            {inputField('URL',       url,       setUrl,       'url',  'https://...')}
+            {inputField('Title *',     title,     setTitle,     'text', 'Article or book title')}
+            {inputField('Author *',    author,    setAuthor,    'text', 'Last, First')}
+            {inputField('Year *',      date,      setDate,      'text', 'YYYY')}
+            {inputField('Publisher',   publisher, setPublisher, 'text', 'Publisher name')}
+            {inputField('URL',         url,       setUrl,       'url',  'https://...')}
           </div>
         </div>
 
         <div className="tool-generate-row">
-          <button className="tool-generate-btn" onClick={handleGenerate} disabled={isLoading || !title.trim()}>
+          <button
+            className="tool-generate-btn"
+            onClick={handleGenerate}
+            disabled={isLoading || !title.trim() || !author.trim() || !date.trim()}
+          >
             <FiBookOpen /> {isLoading ? 'Generating...' : 'Generate Citation'}
           </button>
         </div>
 
         <ToolOutput result={result} isLoading={isLoading} error={error} />
-        <ToolToolbar result={result} onRegenerate={regenerate} onSave={handleSave} toolName="citation-generator" />
+        <ToolToolbar result={result} onRegenerate={handleGenerate} toolName="citation-generator" />
       </div>
     </DashboardLayout>
   );

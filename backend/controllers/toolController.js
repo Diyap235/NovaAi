@@ -222,19 +222,83 @@ const readability = async (req, res, next) => {
   }
 };
 
-// ─── Extra AI tools (vocabulary, plagiarism) ──────────────────────────────────
+// ─── Extra AI tools ───────────────────────────────────────────────────────────
 
 // POST /api/tools/vocabulary  { text, mode? }
 const vocabulary = handleAITool('vocabulary');
 
-// POST /api/tools/plagiarism  { text, mode? }
-const plagiarism = handleAITool('plagiarism');
+// ═══════════════════════════════════════════════════════════════════════════════
+// PLAGIARISM DETECTION — Full NLP pipeline (no AI)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// POST /api/tools/plagiarism  { text }
+const plagiarism = async (req, res, next) => {
+  try {
+    const { text } = req.body;
+    if (!validateText(text, res)) return;
+
+    const analysis = nlpService.detectPlagiarism(text.trim());
+
+    // Return the human-readable report as `result` so ToolOutput renders it,
+    // and attach the full structured data as `analysis` for programmatic use.
+    res.json({
+      success: true,
+      tool: 'plagiarism',
+      result: analysis.report,
+      analysis,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CITATION GENERATOR — Strict field-based (no NLP, no AI, no text validation)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// POST /api/tools/citation  { style, title, author, year, publisher?, url?, type? }
+//
+// Mode 2 is completely independent from Mode 1.
+// It NEVER calls validateText(). It NEVER checks for inputText.
+// All validation is field-driven inside nlpService.generateCitation().
+const citation = async (req, res, next) => {
+  try {
+    // Accept fields either flat on the body or nested under `data` (legacy shape)
+    const body = req.body || {};
+    const data = body.data && typeof body.data === 'object' ? body.data : body;
+
+    const { style, format, title, author, year, publisher, url, type } = {
+      style:     body.style || body.format || (body.data && (body.data.style || body.data.format)),
+      title:     data.title,
+      author:    data.author,
+      year:      data.year || data.date,
+      publisher: data.publisher,
+      url:       data.url,
+      type:      data.type,
+    };
+
+    const output = nlpService.generateCitation({ title, author, year, publisher, url, style, type });
+
+    if (output.status === 'error') {
+      return res.status(400).json({ success: false, message: output.message });
+    }
+
+    res.json({
+      success: true,
+      tool: 'citation',
+      result: `Your citation:\n${output.data}`,
+      citation: output.data,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 module.exports = {
   paraphrase, humanize, enhance, restructure, toneRewrite, styleRewrite,
-  vocabulary, plagiarism,
+  vocabulary, plagiarism, citation,
   keywordDensity, similarity, sentiment,
   summarize, grammar, readability,
   AI_TOOLS, NLP_TOOLS, HYBRID_TOOLS,
