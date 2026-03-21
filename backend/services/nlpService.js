@@ -879,15 +879,14 @@ const detectPlagiarism = (inputText) => {
       overall_risk: 'low',
       report: [
         'PLAGIARISM REPORT',
-        '----------------------------',
-        '📝 Input Summary:',
+        'Input Summary:',
         'Text is too short for reliable plagiarism analysis (minimum ~20 words recommended).',
         '',
-        '📊 Overall Result:',
+        'Overall Result:',
         '- Plagiarism Score: N/A',
         '- Risk Level: LOW CONFIDENCE',
         '',
-        '💡 Suggestion:',
+        'Suggestion:',
         'Provide a longer text sample for accurate results.',
       ].join('\n'),
     };
@@ -988,22 +987,19 @@ const detectPlagiarism = (inputText) => {
     .sort((a, b) => b.similarity_score - a.similarity_score)
     .slice(0, 5);
 
-  const riskEmoji = { high: '🔴', moderate: '🟡', low: '🟢' }[overall_risk];
-
   const reportLines = [
     'PLAGIARISM REPORT',
-    '----------------------------',
-    '📝 Input Summary:',
+    'Input Summary:',
     `Analyzed ${sentences.length} sentence(s) and ${chunks.length} text chunk(s) across ${corpus.length} reference source(s).`,
     '',
-    '📊 Overall Result:',
+    'Overall Result:',
     `- Plagiarism Score: ${plagiarism_percentage}%`,
-    `- Risk Level: ${riskEmoji} ${overall_risk.toUpperCase()}`,
+    `- Risk Level: ${overall_risk.toUpperCase()}`,
     '',
   ];
 
   if (topMatches.length > 0) {
-    reportLines.push('🔍 Matched Content:');
+    reportLines.push('Matched Content:');
     topMatches.forEach((m, i) => {
       reportLines.push(
         `  ${i + 1}. "${m.matched_text.slice(0, 60)}${m.matched_text.length > 60 ? '...' : ''}"`,
@@ -1014,16 +1010,16 @@ const detectPlagiarism = (inputText) => {
   }
 
   if (mergedHighlights.length > 0) {
-    reportLines.push('🟡 Highlighted Sections:');
+    reportLines.push('Highlighted Sections:');
     mergedHighlights.slice(0, 5).forEach((h) => {
-      reportLines.push(`  • [${h.match_type}] "${h.text.slice(0, 80)}${h.text.length > 80 ? '...' : ''}"`);
+      reportLines.push(`  - [${h.match_type}] "${h.text.slice(0, 80)}${h.text.length > 80 ? '...' : ''}"`);
     });
     reportLines.push('');
   } else {
-    reportLines.push('✅ No significant matches found.\n');
+    reportLines.push('No significant matches found.\n');
   }
 
-  reportLines.push('💡 Suggestion:');
+  reportLines.push('Suggestion:');
   if (overall_risk === 'high') {
     reportLines.push('High similarity detected. Rewrite flagged sections in your own words and cite any sources you referenced.');
   } else if (overall_risk === 'moderate') {

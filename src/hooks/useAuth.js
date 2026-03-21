@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiLogin, apiSignup } from '../services/api';
+import { apiLogin, apiSignup, apiGetProfile, apiUpdateProfile, apiChangePassword } from '../services/api';
 
 /**
- * Central auth hook — works with both the real backend and localStorage fallback.
- * Stores { token, ...user } in localStorage under 'currentUser'.
+ * Central auth hook — syncs with backend on mount, persists token in localStorage.
  */
 export function useAuth() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -27,6 +26,23 @@ export function useAuth() {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
+  // Re-fetch fresh profile from backend whenever a token exists
+  useEffect(() => {
+    if (!currentUser?.token) return;
+    apiGetProfile()
+      .then((res) => {
+        const fresh = { ...res.data.user, token: currentUser.token };
+        localStorage.setItem('currentUser', JSON.stringify(fresh));
+        setCurrentUser(fresh);
+      })
+      .catch(() => {
+        // Token expired or invalid — log out silently
+        localStorage.removeItem('currentUser');
+        setCurrentUser(null);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const persist = useCallback((userData) => {
     localStorage.setItem('currentUser', JSON.stringify(userData));
     setCurrentUser(userData);
@@ -36,7 +52,6 @@ export function useAuth() {
   const login = useCallback(async (email, password) => {
     try {
       const res = await apiLogin(email, password);
-      // Backend returns { data: { user, token } }
       const userData = { ...res.data.user, token: res.data.token };
       persist(userData);
       return { success: true };
@@ -56,16 +71,27 @@ export function useAuth() {
     }
   }, []);
 
-  // ── Update profile (local only — call apiUpdateProfile separately) ─────────
-  const updateProfile = useCallback((updates) => {
+  // ── Update profile — hits backend, syncs localStorage ─────────────────────
+  const updateProfile = useCallback(async (updates) => {
     try {
-      const updated = { ...currentUser, ...updates };
+      const res = await apiUpdateProfile(updates);
+      const updated = { ...currentUser, ...res.data.user };
       persist(updated);
       return { success: true };
-    } catch {
-      return { success: false, error: 'Failed to update profile.' };
+    } catch (err) {
+      return { success: false, error: err.message || 'Failed to update profile.' };
     }
   }, [currentUser, persist]);
+
+  // ── Change password — hits backend ────────────────────────────────────────
+  const changePassword = useCallback(async (currentPassword, newPassword) => {
+    try {
+      await apiChangePassword(currentPassword, newPassword);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message || 'Failed to change password.' };
+    }
+  }, []);
 
   // ── Logout ─────────────────────────────────────────────────────────────────
   const logout = useCallback(() => {
@@ -73,5 +99,5 @@ export function useAuth() {
     setCurrentUser(null);
   }, []);
 
-  return { currentUser, login, signup, updateProfile, logout };
+  return { currentUser, login, signup, updateProfile, changePassword, logout };
 }

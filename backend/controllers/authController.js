@@ -87,8 +87,8 @@ const updateProfile = async (req, res, next) => {
     const { name, email } = req.body;
     const user = await User.findById(req.user._id);
 
-    if (name)  user.name  = name;
-    if (email) user.email = email;
+    if (name  && name.trim())  user.name  = name.trim();
+    if (email && email.trim()) user.email = email.trim();
 
     const updated = await user.save();
     res.json({ success: true, message: 'Profile updated.', data: { user: updated } });
