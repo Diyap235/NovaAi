@@ -71,7 +71,7 @@ app.use(errorHandler);
 // ─── Start server ─────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀  Nova AI server running on port ${PORT} [${process.env.NODE_ENV}]`);
+  console.log(` Nova AI server running on port ${PORT} [${process.env.NODE_ENV}]`);
 });
 
 module.exports = app;
