@@ -25,7 +25,7 @@ function ToneAnalyzer() {
 
         <div className="tool-panels">
           <ToolInput value={input} onChange={setInput} placeholder="Enter text to analyze its tone..." />
-          <ToolOutput result={result} isLoading={isLoading} error={error} />
+          <ToolOutput result={result} isLoading={isLoading} error={error} originalInput={input} />
         </div>
 
         <div className="tool-generate-row">

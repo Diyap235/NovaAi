@@ -25,7 +25,7 @@ function WordChoiceEnhancer() {
 
         <div className="tool-panels">
           <ToolInput value={input} onChange={setInput} placeholder="Enter text to enhance word choices..." />
-          <ToolOutput result={result} isLoading={isLoading} error={error} />
+          <ToolOutput result={result} isLoading={isLoading} error={error} originalInput={input} />
         </div>
 
         <div className="tool-generate-row">

@@ -4,7 +4,7 @@ import CopyButton from './CopyButton';
 import DownloadButton from './DownloadButton';
 import ShareButton from './ShareButton';
 
-function ToolToolbar({ result, onRegenerate, onSave, toolName = 'nova-ai-result' }) {
+function ToolToolbar({ result, onRegenerate, onSave, toolName = 'nova-ai-result', input = '' }) {
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {

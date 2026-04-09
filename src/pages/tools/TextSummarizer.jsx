@@ -52,7 +52,7 @@ function TextSummarizer() {
 
         <div className="tool-panels">
           <ToolInput value={input} onChange={setInput} placeholder="Paste your long text to summarize..." />
-          <ToolOutput result={result} isLoading={isLoading} error={error} />
+          <ToolOutput result={result} isLoading={isLoading} error={error} originalInput={input} />
         </div>
 
         <div className="tool-generate-row">

@@ -34,7 +34,7 @@ function PlagiarismDetector() {
             placeholder="Paste your text here to check for plagiarism (minimum ~20 words for reliable results)..."
             maxLength={5000}
           />
-          <ToolOutput result={result} isLoading={isLoading} error={error} />
+          <ToolOutput result={result} isLoading={isLoading} error={error} originalInput={input} />
         </div>
 
         <div className="tool-generate-row">

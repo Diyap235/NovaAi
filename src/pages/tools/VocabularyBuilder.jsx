@@ -25,7 +25,7 @@ function VocabularyBuilder() {
 
         <div className="tool-panels">
           <ToolInput value={input} onChange={setInput} placeholder="Enter a word or sentence to explore vocabulary..." />
-          <ToolOutput result={result} isLoading={isLoading} error={error} />
+          <ToolOutput result={result} isLoading={isLoading} error={error} originalInput={input} />
         </div>
 
         <div className="tool-generate-row">

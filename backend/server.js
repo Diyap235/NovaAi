@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
 const express    = require('express');
 const cors       = require('cors');
@@ -11,6 +11,16 @@ const authRoutes       = require('./routes/authRoutes');
 const draftRoutes      = require('./routes/draftRoutes');
 const toolRoutes       = require('./routes/toolRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+
+// ─── Validate critical env vars before anything starts ───────────────────────
+if (!process.env.JWT_SECRET) {
+  console.error('❌  FATAL: JWT_SECRET is not set in .env. Exiting.');
+  process.exit(1);
+}
+if (!process.env.MONGO_URI) {
+  console.error('❌  FATAL: MONGO_URI is not set in .env. Exiting.');
+  process.exit(1);
+}
 
 // ─── Connect to MongoDB ───────────────────────────────────────────────────────
 connectDB();

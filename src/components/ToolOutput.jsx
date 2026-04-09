@@ -1,11 +1,14 @@
+import { useState } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import CharacterCounter from './CharacterCounter';
 
 /**
  * Reusable result output panel used by all 12 tool pages.
- * Shows loading state, error state, or the AI result.
+ * Supports side-by-side comparison when `originalInput` prop is provided.
  */
-function ToolOutput({ result, isLoading, error }) {
+function ToolOutput({ result, isLoading, error, originalInput = '' }) {
+  const [compareMode, setCompareMode] = useState(false);
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -19,6 +22,24 @@ function ToolOutput({ result, isLoading, error }) {
       return <div className="tool-output-error" role="alert">{error}</div>;
     }
     if (result) {
+      if (compareMode && originalInput) {
+        return (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>ORIGINAL</p>
+              <div className="tool-output-text" style={{ background: 'rgba(239,68,68,0.05)', borderRadius: '8px', padding: '1rem' }}>
+                {originalInput}
+              </div>
+            </div>
+            <div>
+              <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>RESULT</p>
+              <div className="tool-output-text" style={{ background: 'rgba(168,85,247,0.05)', borderRadius: '8px', padding: '1rem' }}>
+                {result}
+              </div>
+            </div>
+          </div>
+        );
+      }
       return (
         <>
           <div className="tool-output-text">{result}</div>
@@ -39,7 +60,18 @@ function ToolOutput({ result, isLoading, error }) {
     <div className="tool-output-wrapper">
       <div className="tool-output-header">
         <span className="tool-output-label">Result</span>
-        {isLoading && <span className="tool-output-indicator">Processing...</span>}
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          {result && originalInput && (
+            <button
+              onClick={() => setCompareMode((p) => !p)}
+              className="tool-input-btn"
+              style={compareMode ? { borderColor: 'var(--color-primary)', color: 'var(--color-primary)' } : {}}
+            >
+              {compareMode ? 'Result Only' : 'Compare'}
+            </button>
+          )}
+          {isLoading && <span className="tool-output-indicator">Processing...</span>}
+        </div>
       </div>
       <div className="tool-output-body">{renderContent()}</div>
     </div>
