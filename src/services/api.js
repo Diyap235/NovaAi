@@ -73,7 +73,16 @@ const callTool = (endpoint, body) =>
 const formatObject = (obj) => JSON.stringify(obj, null, 2);
 
 // AI generative tools — result is always a plain string
-export const improveWriting       = (text, opts = {}) => callTool('/tools/enhance',         { text, ...opts });
+export const improveWriting = (text, opts = {}) =>
+  request('/tools/enhance', {
+    method: 'POST',
+    body: JSON.stringify({
+      text,
+      tone:   opts.tone   || 'professional',
+      style:  opts.style  || 'formal',
+      length: opts.length || 'same',
+    }),
+  }).then((r) => r.result);
 export const paraphraseText       = (text, opts = {}) => callTool('/tools/paraphrase',      { text, ...opts });
 export const humanizeText         = (text, opts = {}) => callTool('/tools/humanize',        { text, ...opts });
 export const restructureSentences = (text, opts = {}) => callTool('/tools/restructure',     { text, ...opts });
@@ -91,7 +100,8 @@ export const analyzeTone = (text) =>
     ].join('\n');
   });
 export const applyStyleGuide      = (text, opts = {}) => callTool('/tools/style',           { text, ...opts });
-export const enhanceWordChoice    = (text, opts = {}) => callTool('/tools/enhance',         { text, ...opts });
+export const enhanceWordChoice    = (text) =>
+  request('/tools/word-choice', { method: 'POST', body: JSON.stringify({ text }) }).then((r) => r.result);
 export const buildVocabulary      = (text, opts = {}) => callTool('/tools/vocabulary',      { text, ...opts });
 
 // Hybrid tools — NLP by default, AI only when explicitly opted in

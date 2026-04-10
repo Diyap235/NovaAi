@@ -14,13 +14,28 @@
 
 // ─── Mode descriptors injected into prompts ───────────────────────────────────
 const MODE_DESCRIPTORS = {
-  formal:   'formal, professional, and polished',
-  casual:   'casual, conversational, and friendly',
-  academic: 'academic, precise, and scholarly with discipline-appropriate vocabulary',
-  creative: 'creative, expressive, and engaging with vivid language',
+  formal:       'formal, professional, and polished',
+  casual:       'casual, conversational, and friendly',
+  academic:     'academic, precise, and scholarly with discipline-appropriate vocabulary',
+  creative:     'creative, expressive, and engaging with vivid language',
+  // Tone options
+  professional: 'professional, confident, and authoritative',
+  friendly:     'warm, friendly, and approachable',
+  persuasive:   'persuasive, compelling, and convincing',
+  // Style options
+  business:     'business-oriented, concise, and results-focused',
+  blog:         'conversational blog-style, engaging, and easy to read',
 };
 
-const getMode = (mode) => MODE_DESCRIPTORS[mode] || MODE_DESCRIPTORS.formal;
+const getMode = (mode) =>
+  MODE_DESCRIPTORS[(mode || '').toLowerCase()] || MODE_DESCRIPTORS.formal;
+
+// ─── Length instructions ──────────────────────────────────────────────────────
+const LENGTH_INSTRUCTIONS = {
+  shorter: 'Make the output noticeably shorter — remove filler, condense sentences, keep only essential content.',
+  same:    'Keep the output roughly the same length as the input.',
+  longer:  'Expand the output — add more detail, examples, and elaboration while staying on topic.',
+};
 
 // ─── Shared output rules appended to every prompt ────────────────────────────
 const OUTPUT_RULES = `
@@ -65,11 +80,22 @@ const prompts = {
     OUTPUT_RULES +
     `\n\nText:\n${text}\n\nHumanized Text:`,
 
-  enhance: (text, mode) =>
-    `Enhance the following text to make it more compelling, clear, and impactful in a ${getMode(mode)} style. ` +
-    `Improve word choice, sentence structure, and overall quality without changing the core message.\n` +
-    OUTPUT_RULES +
-    `\n\nOriginal Text:\n${text}\n\nEnhanced Text:`,
+  enhance: (text, mode, opts = {}) => {
+    const tone   = opts.tone   || mode || 'professional';
+    const style  = opts.style  || 'formal';
+    const length = opts.length || 'same';
+    const lengthInstruction = LENGTH_INSTRUCTIONS[(length || '').toLowerCase()] || LENGTH_INSTRUCTIONS.same;
+    return (
+      `Enhance the following text with these exact requirements:\n` +
+      `- Tone: ${getMode(tone)}\n` +
+      `- Writing Style: ${getMode(style)}\n` +
+      `- Length: ${lengthInstruction}\n\n` +
+      `Improve word choice, sentence structure, clarity, and overall quality. ` +
+      `Do not change the core message or add new facts.\n` +
+      OUTPUT_RULES +
+      `\n\nOriginal Text:\n${text}\n\nEnhanced Text:`
+    );
+  },
 
   restructure: (text, mode) =>
     `Restructure the sentences in the following text to improve logical flow, clarity, and readability ` +
@@ -110,15 +136,16 @@ const prompts = {
 
 /**
  * Builds a structured prompt for the given tool type.
- * @param {string} type  - Tool type (e.g. "paraphrase", "grammar")
+ * @param {string} type  - Tool type (e.g. "enhance", "paraphrase")
  * @param {string} text  - Input text from user
  * @param {string} mode  - Writing mode: formal | casual | academic | creative
+ * @param {object} opts  - Extra options (tone, style, length) for enhance
  * @returns {string}     - Complete prompt string ready for AI
  */
-const buildPrompt = (type, text, mode = 'formal') => {
+const buildPrompt = (type, text, mode = 'formal', opts = {}) => {
   const builder = prompts[type];
   if (!builder) throw new Error(`Unknown prompt type: "${type}". Supported: ${Object.keys(prompts).join(', ')}`);
-  return builder(text, mode);
+  return builder(text, mode, opts);
 };
 
 module.exports = { buildPrompt };

@@ -1186,6 +1186,205 @@ const generateCitation = ({ title, author, year, publisher, url, style, type } =
   };
 };
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// WORD CHOICE ENHANCER — NLP-powered (wordpos + natural + compromise)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const WordPOS = require('wordpos');
+const wordpos = new WordPOS();
+
+// Weak/overused words with stronger alternatives (curated wordlist)
+const WEAK_WORD_MAP = {
+  // Verbs
+  'said':      ['stated', 'declared', 'remarked', 'noted', 'asserted'],
+  'got':       ['obtained', 'acquired', 'received', 'gained', 'secured'],
+  'get':       ['obtain', 'acquire', 'receive', 'gain', 'secure'],
+  'make':      ['create', 'produce', 'generate', 'craft', 'develop'],
+  'made':      ['created', 'produced', 'generated', 'crafted', 'developed'],
+  'show':      ['demonstrate', 'illustrate', 'reveal', 'exhibit', 'highlight'],
+  'showed':    ['demonstrated', 'illustrated', 'revealed', 'exhibited', 'highlighted'],
+  'use':       ['utilize', 'employ', 'apply', 'leverage', 'implement'],
+  'used':      ['utilized', 'employed', 'applied', 'leveraged', 'implemented'],
+  'help':      ['assist', 'support', 'facilitate', 'enable', 'aid'],
+  'helped':    ['assisted', 'supported', 'facilitated', 'enabled', 'aided'],
+  'think':     ['believe', 'consider', 'conclude', 'determine', 'assess'],
+  'thought':   ['believed', 'considered', 'concluded', 'determined', 'assessed'],
+  'look':      ['examine', 'analyze', 'inspect', 'observe', 'review'],
+  'looked':    ['examined', 'analyzed', 'inspected', 'observed', 'reviewed'],
+  'give':      ['provide', 'offer', 'present', 'deliver', 'supply'],
+  'gave':      ['provided', 'offered', 'presented', 'delivered', 'supplied'],
+  'put':       ['place', 'position', 'insert', 'establish', 'set'],
+  'take':      ['acquire', 'obtain', 'capture', 'extract', 'derive'],
+  'took':      ['acquired', 'obtained', 'captured', 'extracted', 'derived'],
+  'come':      ['arrive', 'emerge', 'appear', 'approach', 'surface'],
+  'came':      ['arrived', 'emerged', 'appeared', 'approached', 'surfaced'],
+  'go':        ['proceed', 'advance', 'progress', 'move', 'travel'],
+  'went':      ['proceeded', 'advanced', 'progressed', 'moved', 'traveled'],
+  'see':       ['observe', 'notice', 'perceive', 'identify', 'recognize'],
+  'saw':       ['observed', 'noticed', 'perceived', 'identified', 'recognized'],
+  'know':      ['understand', 'recognize', 'comprehend', 'realize', 'grasp'],
+  'knew':      ['understood', 'recognized', 'comprehended', 'realized', 'grasped'],
+  'want':      ['desire', 'seek', 'require', 'aim for', 'intend'],
+  'wanted':    ['desired', 'sought', 'required', 'aimed for', 'intended'],
+  'need':      ['require', 'demand', 'necessitate', 'depend on', 'call for'],
+  'needed':    ['required', 'demanded', 'necessitated', 'depended on', 'called for'],
+  'try':       ['attempt', 'endeavor', 'strive', 'seek', 'pursue'],
+  'tried':     ['attempted', 'endeavored', 'strived', 'sought', 'pursued'],
+  'start':     ['initiate', 'commence', 'launch', 'establish', 'introduce'],
+  'started':   ['initiated', 'commenced', 'launched', 'established', 'introduced'],
+  'end':       ['conclude', 'finalize', 'terminate', 'complete', 'resolve'],
+  'ended':     ['concluded', 'finalized', 'terminated', 'completed', 'resolved'],
+  'find':      ['discover', 'identify', 'locate', 'determine', 'uncover'],
+  'found':     ['discovered', 'identified', 'located', 'determined', 'uncovered'],
+  'tell':      ['inform', 'notify', 'communicate', 'convey', 'explain'],
+  'told':      ['informed', 'notified', 'communicated', 'conveyed', 'explained'],
+  'ask':       ['inquire', 'request', 'query', 'question', 'solicit'],
+  'asked':     ['inquired', 'requested', 'queried', 'questioned', 'solicited'],
+  'keep':      ['maintain', 'preserve', 'retain', 'sustain', 'uphold'],
+  'kept':      ['maintained', 'preserved', 'retained', 'sustained', 'upheld'],
+  'change':    ['modify', 'alter', 'transform', 'revise', 'adjust'],
+  'changed':   ['modified', 'altered', 'transformed', 'revised', 'adjusted'],
+  'increase':  ['enhance', 'expand', 'amplify', 'elevate', 'boost'],
+  'decreased': ['reduced', 'diminished', 'declined', 'lowered', 'contracted'],
+  // Adjectives
+  'good':      ['excellent', 'effective', 'superior', 'outstanding', 'remarkable'],
+  'bad':       ['poor', 'inadequate', 'inferior', 'deficient', 'substandard'],
+  'big':       ['substantial', 'significant', 'considerable', 'extensive', 'large-scale'],
+  'small':     ['minimal', 'limited', 'modest', 'minor', 'negligible'],
+  'important': ['critical', 'essential', 'significant', 'crucial', 'vital'],
+  'new':       ['innovative', 'novel', 'emerging', 'contemporary', 'modern'],
+  'old':       ['established', 'traditional', 'conventional', 'longstanding', 'dated'],
+  'many':      ['numerous', 'multiple', 'various', 'several', 'abundant'],
+  'few':       ['limited', 'scarce', 'minimal', 'sparse', 'insufficient'],
+  'hard':      ['challenging', 'demanding', 'complex', 'rigorous', 'difficult'],
+  'easy':      ['straightforward', 'simple', 'accessible', 'manageable', 'effortless'],
+  'fast':      ['rapid', 'swift', 'efficient', 'accelerated', 'expedient'],
+  'slow':      ['gradual', 'deliberate', 'measured', 'unhurried', 'methodical'],
+  'clear':     ['evident', 'apparent', 'transparent', 'explicit', 'unambiguous'],
+  'real':      ['genuine', 'authentic', 'actual', 'tangible', 'concrete'],
+  'different': ['distinct', 'diverse', 'varied', 'alternative', 'contrasting'],
+  'same':      ['identical', 'consistent', 'uniform', 'equivalent', 'comparable'],
+  'high':      ['elevated', 'substantial', 'significant', 'considerable', 'superior'],
+  'low':       ['minimal', 'reduced', 'limited', 'modest', 'diminished'],
+  // Adverbs
+  'very':      ['extremely', 'highly', 'significantly', 'considerably', 'substantially'],
+  'really':    ['genuinely', 'truly', 'notably', 'remarkably', 'particularly'],
+  'just':      ['precisely', 'exactly', 'specifically', 'merely', 'simply'],
+  'also':      ['additionally', 'furthermore', 'moreover', 'likewise', 'similarly'],
+  'often':     ['frequently', 'regularly', 'consistently', 'repeatedly', 'routinely'],
+  'always':    ['consistently', 'invariably', 'perpetually', 'continuously', 'constantly'],
+  'never':     ['rarely', 'seldom', 'infrequently', 'scarcely', 'hardly ever'],
+  'only':      ['solely', 'exclusively', 'merely', 'purely', 'strictly'],
+  'quickly':   ['rapidly', 'swiftly', 'promptly', 'efficiently', 'expeditiously'],
+  'slowly':    ['gradually', 'methodically', 'deliberately', 'incrementally', 'steadily'],
+  'well':      ['effectively', 'proficiently', 'skillfully', 'competently', 'adeptly'],
+  'badly':     ['poorly', 'inadequately', 'ineffectively', 'deficiently', 'insufficiently'],
+};
+
+/**
+ * Enhances word choice using wordpos POS tagging + curated wordlist + compromise NLP.
+ * Identifies weak/overused words and suggests stronger alternatives.
+ *
+ * @param {string} text
+ * @returns {Promise<string>} — formatted enhancement report
+ */
+const enhanceWordChoice = async (text) => {
+  const doc    = nlp(text);
+  const tokens = tokenize(text);
+
+  // Get POS tags via compromise
+  const pos = {
+    verbs:      new Set(doc.verbs().out('array').map((w) => w.toLowerCase().replace(/[^a-z]/g, ''))),
+    adjectives: new Set(doc.adjectives().out('array').map((w) => w.toLowerCase())),
+    adverbs:    new Set(doc.adverbs().out('array').map((w) => w.toLowerCase())),
+    nouns:      new Set(doc.nouns().out('array').map((w) => w.toLowerCase())),
+  };
+
+  // Find weak words in the text
+  const suggestions = [];
+  const seen = new Set();
+
+  for (const token of tokens) {
+    const lower = token.toLowerCase();
+    if (seen.has(lower)) continue;
+    if (WEAK_WORD_MAP[lower]) {
+      seen.add(lower);
+      // Determine POS category
+      let category = 'word';
+      if (pos.verbs.has(lower))      category = 'verb';
+      else if (pos.adjectives.has(lower)) category = 'adjective';
+      else if (pos.adverbs.has(lower))    category = 'adverb';
+      else if (pos.nouns.has(lower))      category = 'noun';
+
+      suggestions.push({
+        word:        lower,
+        category,
+        alternatives: WEAK_WORD_MAP[lower],
+      });
+    }
+  }
+
+  // Use wordpos to verify/enrich — get synonyms for nouns and adjectives
+  const wordposEnrichments = [];
+  const wordposTargets = tokens
+    .filter((t) => pos.adjectives.has(t.toLowerCase()) || pos.nouns.has(t.toLowerCase()))
+    .filter((t) => t.length > 3 && !STOP_WORDS.has(t.toLowerCase()))
+    .slice(0, 8); // limit to avoid slowdown
+
+  for (const word of wordposTargets) {
+    try {
+      const isAdj  = await wordpos.isAdjective(word);
+      const isNoun = await wordpos.isNoun(word);
+      if (isAdj || isNoun) {
+        wordposEnrichments.push({ word, type: isAdj ? 'adjective' : 'noun' });
+      }
+    } catch {
+      // wordpos lookup failed — skip silently
+    }
+  }
+
+  // Build output report
+  const lines = [];
+
+  lines.push(`📝 Word Choice Analysis`);
+  lines.push(`${'─'.repeat(40)}`);
+  lines.push(`Total words: ${tokens.length}`);
+  lines.push(`Weak/overused words found: ${suggestions.length}`);
+  lines.push('');
+
+  if (suggestions.length === 0) {
+    lines.push('✅ Great job! No weak or overused words detected.');
+    lines.push('   Your word choices are strong and varied.');
+  } else {
+    lines.push('⚠️  Suggestions to strengthen your writing:');
+    lines.push('');
+    suggestions.forEach((s, i) => {
+      lines.push(`${i + 1}. "${s.word}" [${s.category}]`);
+      lines.push(`   → Try: ${s.alternatives.slice(0, 3).join(', ')}`);
+    });
+  }
+
+  lines.push('');
+  lines.push(`🔍 POS Breakdown (via compromise NLP):`);
+  lines.push(`   Verbs: ${[...pos.verbs].slice(0, 6).join(', ') || 'none'}`);
+  lines.push(`   Adjectives: ${[...pos.adjectives].slice(0, 6).join(', ') || 'none'}`);
+  lines.push(`   Adverbs: ${[...pos.adverbs].slice(0, 6).join(', ') || 'none'}`);
+
+  if (wordposEnrichments.length > 0) {
+    lines.push('');
+    lines.push(`📚 WordNet-verified words (wordpos):`);
+    wordposEnrichments.forEach((w) => {
+      lines.push(`   • "${w.word}" — confirmed ${w.type}`);
+    });
+  }
+
+  lines.push('');
+  lines.push(`💡 Tip: Replace weak words with the suggested alternatives`);
+  lines.push(`   to make your writing more precise and impactful.`);
+
+  return lines.join('\n');
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 module.exports = {
@@ -1199,4 +1398,5 @@ module.exports = {
   correctGrammar,
   detectPlagiarism,
   generateCitation,
+  enhanceWordChoice,
 };

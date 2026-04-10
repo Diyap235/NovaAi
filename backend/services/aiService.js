@@ -1,25 +1,26 @@
 /**
- * aiService.js — Generative AI Layer (OpenAI)
+ * aiService.js — Generative AI Layer (Groq)
  *
- * ROUTING RULE: This service is ONLY called for generative tasks:
- *   paraphrase | humanize | enhance | restructure | tone | style | grammar (complex) | summarize (advanced)
+ * Uses Groq's API with llama-3.3-70b-versatile model.
+ * Drop-in replacement for OpenAI — same interface, much faster, free tier available.
  *
- * NLP analytical tasks (keyword density, similarity, sentiment) are handled by nlpService.js
+ * ROUTING RULE: Only called for generative tasks:
+ *   paraphrase | humanize | enhance | restructure | tone | style | grammar (AI) | summarize (AI)
  */
 
-const OpenAI = require('openai');
+const Groq = require('groq-sdk');
 
 // ─── Client (lazy init) ───────────────────────────────────────────────────────
 let _client = null;
 const getClient = () => {
   if (!_client) {
-    if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY is not set in environment.');
-    _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    if (!process.env.GROQ_API_KEY) throw new Error('GROQ_API_KEY is not set in environment.');
+    _client = new Groq({ apiKey: process.env.GROQ_API_KEY });
   }
   return _client;
 };
 
-// ─── System prompt (human-like writing enforcer) ──────────────────────────────
+// ─── System prompt ────────────────────────────────────────────────────────────
 const SYSTEM_PROMPT =
   'You are a professional human writer with expertise in linguistics and creative writing. ' +
   'Rewrite and generate text that is natural, fluent, and contextually accurate. ' +
@@ -36,26 +37,22 @@ const SYSTEM_PROMPT =
  */
 const generate = async (prompt, options = {}) => {
   const {
-    maxTokens        = 1024,
-    temperature      = 0.85,
-    top_p            = 0.9,
-    presence_penalty = 0.6,
-    frequency_penalty = 0.3,
+    maxTokens   = 1024,
+    temperature = 0.85,
+    top_p       = 0.9,
   } = options;
 
   const client = getClient();
 
   const response = await client.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model:       'llama-3.3-70b-versatile',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user',   content: prompt },
     ],
-    max_tokens:        maxTokens,
+    max_tokens:  maxTokens,
     temperature,
     top_p,
-    presence_penalty,
-    frequency_penalty,
   });
 
   const output = response.choices?.[0]?.message?.content?.trim();

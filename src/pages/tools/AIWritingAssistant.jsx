@@ -26,6 +26,9 @@ function AIWritingAssistant() {
   const { input, setInput, result, isLoading, error, run, regenerate, handleSave } =
     useToolState('AI Writing Assistant', apiFn);
 
+  // re-run with latest settings when user clicks Enhance
+  const handleRun = useCallback(() => run(), [run]);
+
   return (
     <DashboardLayout>
       <div className="tool-page">
@@ -70,7 +73,7 @@ function AIWritingAssistant() {
 
         {/* Generate */}
         <div className="tool-generate-row">
-          <button className="tool-generate-btn" onClick={() => run()} disabled={isLoading || !input.trim()}>
+          <button className="tool-generate-btn" onClick={handleRun} disabled={isLoading || !input.trim()}>
             <FiZap /> {isLoading ? 'Processing...' : 'Enhance Writing'}
           </button>
         </div>

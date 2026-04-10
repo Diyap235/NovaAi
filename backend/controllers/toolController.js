@@ -56,10 +56,22 @@ const handleAITool = (toolType) => async (req, res, next) => {
 
 const paraphrase   = handleAITool('paraphrase');
 const humanize     = handleAITool('humanize');
-const enhance      = handleAITool('enhance');
 const restructure  = handleAITool('restructure');
 const toneRewrite  = handleAITool('tone');
 const styleRewrite = handleAITool('style');
+
+// POST /api/tools/enhance — respects tone, style, length options
+const enhance = async (req, res, next) => {
+  try {
+    const { text, mode = 'formal', tone = 'professional', style = 'formal', length = 'same' } = req.body;
+    if (!validateText(text, res)) return;
+    const prompt = buildPrompt('enhance', text.trim(), mode, { tone, style, length });
+    const result = await aiService.generate(prompt);
+    respond(res, 'enhance', result, { mode, tone, style, length });
+  } catch (err) {
+    next(err);
+  }
+};
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // NLP TOOLS — Analytical: nlpService only, zero AI calls
@@ -227,6 +239,18 @@ const readability = async (req, res, next) => {
 // POST /api/tools/vocabulary  { text, mode? }
 const vocabulary = handleAITool('vocabulary');
 
+// POST /api/tools/word-choice  { text } — NLP-powered, no AI needed
+const wordChoice = async (req, res, next) => {
+  try {
+    const { text } = req.body;
+    if (!validateText(text, res)) return;
+    const result = await nlpService.enhanceWordChoice(text.trim());
+    respond(res, 'wordChoice', result, { method: 'nlp-wordpos-compromise' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // PLAGIARISM DETECTION — Full NLP pipeline (no AI)
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -298,7 +322,7 @@ const citation = async (req, res, next) => {
 
 module.exports = {
   paraphrase, humanize, enhance, restructure, toneRewrite, styleRewrite,
-  vocabulary, plagiarism, citation,
+  vocabulary, wordChoice, plagiarism, citation,
   keywordDensity, similarity, sentiment,
   summarize, grammar, readability,
   AI_TOOLS, NLP_TOOLS, HYBRID_TOOLS,
