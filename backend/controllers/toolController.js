@@ -1,3 +1,17 @@
+/**
+ * toolController.js — Tool Routing & Orchestration Layer
+ *
+ * ROUTING LOGIC:
+ *   AI Tools (generative)  → promptBuilder → aiService
+ *     paraphrase, humanize, enhance, restructure, tone, style
+ *
+ *   NLP Tools (analytical) → nlpService directly (no AI)
+ *     keywordDensity, similarity, sentiment
+ *
+ *   Hybrid Tools           → NLP first → fallback to AI
+ *     summarize, grammar, readability
+ */
+
 const aiService       = require('../services/aiService');
 const nlpService      = require('../services/nlpService');
 const { buildPrompt } = require('../utils/promptBuilder');
@@ -6,6 +20,7 @@ const { buildPrompt } = require('../utils/promptBuilder');
 const AI_TOOLS     = ['paraphrase', 'humanize', 'enhance', 'restructure', 'tone', 'style'];
 const NLP_TOOLS    = ['keywordDensity', 'similarity', 'sentiment'];
 const HYBRID_TOOLS = ['summarize', 'grammar', 'readability'];
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const validateText = (text, res) => {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
