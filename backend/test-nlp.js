@@ -1,7 +1,3 @@
-/**
- * NLP Tools Test — Direct service layer (no HTTP, no auth, no API key)
- * Run: node test-nlp.js
- */
 
 const nlp = require('./services/nlpService');
 

@@ -1,28 +1,12 @@
-/**
- * toolController.js — Tool Routing & Orchestration Layer
- *
- * ROUTING LOGIC:
- *   AI Tools (generative)  → promptBuilder → aiService
- *     paraphrase, humanize, enhance, restructure, tone, style
- *
- *   NLP Tools (analytical) → nlpService directly (no AI)
- *     keywordDensity, similarity, sentiment
- *
- *   Hybrid Tools           → NLP first → fallback to AI
- *     summarize, grammar, readability
- */
-
 const aiService       = require('../services/aiService');
 const nlpService      = require('../services/nlpService');
 const { buildPrompt } = require('../utils/promptBuilder');
 
-// ─── Routing classification (exported for docs/testing) ──────────────────────
+// ─── Routing classification (exported for docs/testing) ───────────────────────
 const AI_TOOLS     = ['paraphrase', 'humanize', 'enhance', 'restructure', 'tone', 'style'];
 const NLP_TOOLS    = ['keywordDensity', 'similarity', 'sentiment'];
 const HYBRID_TOOLS = ['summarize', 'grammar', 'readability'];
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const validateText = (text, res) => {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
     res.status(400).json({ success: false, message: 'text is required and must be a non-empty string.' });
@@ -34,14 +18,11 @@ const validateText = (text, res) => {
   }
   return true;
 };
-
 const respond = (res, tool, result, extra = {}) =>
   res.json({ success: true, tool, result, ...extra });
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // AI TOOLS — Generative: validate → buildPrompt → aiService.generate
 // ═══════════════════════════════════════════════════════════════════════════════
-
 const handleAITool = (toolType) => async (req, res, next) => {
   try {
     const { text, mode = 'formal' } = req.body;
@@ -53,7 +34,6 @@ const handleAITool = (toolType) => async (req, res, next) => {
     next(err);
   }
 };
-
 const paraphrase   = handleAITool('paraphrase');
 const humanize     = handleAITool('humanize');
 const restructure  = handleAITool('restructure');
@@ -76,7 +56,6 @@ const enhance = async (req, res, next) => {
 // ═══════════════════════════════════════════════════════════════════════════════
 // NLP TOOLS — Analytical: nlpService only, zero AI calls
 // ═══════════════════════════════════════════════════════════════════════════════
-
 // POST /api/tools/keyword-density  { text }
 const keywordDensity = async (req, res, next) => {
   try {
