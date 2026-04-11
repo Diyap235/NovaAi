@@ -1,24 +1,15 @@
 {
   "env": {
     "node": true,
-    "commonjs": true,
-    "es2021": true
+    "es2022": true,
+    "commonjs": true
   },
-  "extends": [
-    "eslint:recommended"
-  ],
+  "extends": "eslint:recommended",
   "parserOptions": {
-    "ecmaVersion": "latest"
-  },
-  "globals": {
-    "require": "readonly",
-    "process": "readonly",
-    "module": "readonly",
-    "console": "readonly",
-    "__dirname": "readonly",
-    "__filename": "readonly"
+    "ecmaVersion": 2022
   },
   "rules": {
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-console": "off"
   }
 }

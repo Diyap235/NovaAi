@@ -260,25 +260,66 @@ const wordChoice = async (req, res, next) => {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // POST /api/tools/plagiarism  { text }
-const plagiarism = async (req, res, next) => {
+plagiarism = async (req, res, next) => {
   try {
     const { text } = req.body;
     if (!validateText(text, res)) return;
 
-    const analysis = nlpService.detectPlagiarism(text.trim());
+    const prompt = `You are an advanced plagiarism detection and originality analysis engine.
+Analyze the following text and estimate the likelihood that it contains plagiarized or non-original content.
 
-    // Return the human-readable report as `result` so ToolOutput renders it,
-    // and attach the full structured data as `analysis` for programmatic use.
-    res.json({
-      success: true,
-      tool: 'plagiarism',
-      result: analysis.report,
-      analysis,
-    });
+OBJECTIVES:
+- Detect common/generic phrases, overused patterns, template-like writing
+- Evaluate how likely this text exists elsewhere in similar form
+- DO NOT reject short text — always provide an estimate
+
+SCORING LOGIC:
+- 0-30: Likely original (unique phrasing)
+- 30-70: Possibly reused / generic phrasing
+- 70-100: Highly likely common or plagiarized
+
+RULES:
+- ALWAYS return a score, never refuse
+- Common factual sentences = LOW plagiarism score
+- Generic AI-like or template sentences = HIGH plagiarism score
+- Be realistic, not overly harsh
+
+Return ONLY valid JSON, no extra text, no markdown:
+{
+  "plagiarism_score": <0 to 100>,
+  "risk_level": "Low | Medium | High",
+  "confidence": "Low | Medium | High",
+  "analysis": "<2-3 sentence explanation>",
+  "flags": [
+    { "text": "<flagged phrase>", "reason": "<why flagged>" }
+  ],
+  "suggestion": "<one actionable suggestion>"
+}
+
+INPUT:
+"${text.trim()}"`;
+
+    const raw = await aiService.generate(prompt, { maxTokens: 1024, temperature: 0.2 });
+
+    let analysis;
+    try {
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      analysis = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+    } catch {
+      const nlpResult = nlpService.detectPlagiarism(text.trim());
+      return res.json({ success: true, tool: 'plagiarism', result: nlpResult.report, analysis: nlpResult });
+    }
+
+    res.json({ success: true, tool: 'plagiarism', result: analysis, analysis });
   } catch (err) {
-    next(err);
+    try {
+      const nlpResult = nlpService.detectPlagiarism(req.body.text.trim());
+      res.json({ success: true, tool: 'plagiarism', result: nlpResult.report, analysis: nlpResult });
+    } catch (e) {
+      next(err);
+    }
   }
-};
+}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CITATION GENERATOR — Strict field-based (no NLP, no AI, no text validation)
