@@ -93,11 +93,24 @@ export function useAuth() {
     }
   }, []);
 
+  // ── Refresh stats from backend (call after saving a draft) ──────────────
+  const refreshStats = useCallback(async () => {
+    if (!currentUser?.token) return;
+    try {
+      const res = await apiGetProfile();
+      const fresh = { ...currentUser, ...res.data.user, token: currentUser.token };
+      localStorage.setItem('currentUser', JSON.stringify(fresh));
+      setCurrentUser(fresh);
+    } catch {
+      // silently ignore
+    }
+  }, [currentUser]);
+
   // ── Logout ─────────────────────────────────────────────────────────────────
   const logout = useCallback(() => {
     localStorage.removeItem('currentUser');
     setCurrentUser(null);
   }, []);
 
-  return { currentUser, login, signup, updateProfile, changePassword, logout };
+  return { currentUser, login, signup, updateProfile, changePassword, logout, refreshStats };
 }

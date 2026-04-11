@@ -22,8 +22,10 @@ const MODE_DESCRIPTORS = {
   professional: 'professional, confident, and authoritative',
   friendly:     'warm, friendly, and approachable',
   persuasive:   'persuasive, compelling, and convincing',
-  // Style options
-  business:     'business-oriented, concise, and results-focused',
+  standard: 'clear, natural, and straightforward',
+  fluent:   'smooth, fluent, and naturally flowing',
+  shorten:  'concise and brief — significantly shorter than the original',
+  expand:   'detailed and elaborated — significantly longer than the original',
   blog:         'conversational blog-style, engaging, and easy to read',
 };
 

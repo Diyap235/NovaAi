@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FiSearch, FiTrash2, FiFilter, FiRefreshCw } from 'react-icons/fi';
 import DashboardLayout from '../layout/DashboardLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -33,33 +33,30 @@ function History() {
   const load = useCallback(async (p = 1) => {
     setIsLoading(true);
     try {
-      const res = await apiGetDrafts({ page: p, limit: 20, ...(filterTool !== 'All' && { tool: filterTool }) });
+      const res = await apiGetDrafts({
+        page: p,
+        limit: 20,
+        ...(search.trim()        && { search: search.trim() }),
+        ...(filterTool !== 'All' && { tool: filterTool }),
+      });
       const drafts = (res.data?.drafts ?? []).map(normalise);
       setItems(drafts);
       setTotalPages(res.data?.pagination?.pages ?? 1);
       setPage(p);
       setUseBackend(true);
     } catch {
-      // Backend unavailable — fall back to localStorage
       setUseBackend(false);
       setItems(getHistory().map(normalise));
       setTotalPages(1);
     } finally {
       setIsLoading(false);
     }
-  }, [filterTool]);
+  }, [filterTool, search]);
 
   useEffect(() => { load(1); }, [load]);
 
-  const filtered = useMemo(() => {
-    if (!search) return items;
-    const q = search.toLowerCase();
-    return items.filter(
-      (item) =>
-        (item.tool ?? '').toLowerCase().includes(q) ||
-        (item.result ?? '').toLowerCase().includes(q)
-    );
-  }, [items, search]);
+  // search is now server-side — items already filtered by backend
+  const filtered = items;
 
   const handleDelete = useCallback(async (item) => {
     if (item.source === 'backend') {

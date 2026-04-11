@@ -127,25 +127,35 @@ const summarize = async (req, res, next) => {
 
     // Always try NLP first unless caller explicitly opts into AI
     if (!useAI) {
+      const { text: clean2, format = 'paragraph', length = 'medium' } = req.body;
       const density   = nlpService.getKeywordDensity(clean);
       const topWords  = new Set(density.keywords.slice(0, 10).map((k) => k.word));
       const sentences = clean.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 0);
+
+      // Adjust how many sentences to extract based on length setting
+      const lengthRatio = length === 'short' ? 0.2 : length === 'long' ? 0.5 : 0.35;
 
       const scored = sentences.map((s) => ({
         sentence: s,
         score: nlpService.tokenize(s).filter((t) => topWords.has(t)).length,
       }));
 
-      const topSentences = scored
+      const extracted = scored
         .sort((a, b) => b.score - a.score)
-        .slice(0, Math.max(2, Math.ceil(sentences.length * 0.35)))
+        .slice(0, Math.max(2, Math.ceil(sentences.length * lengthRatio)))
         .sort((a, b) => sentences.indexOf(a.sentence) - sentences.indexOf(b.sentence))
-        .map((s) => s.sentence)
-        .join(' ');
+        .map((s) => s.sentence);
 
-      // Return NLP result as long as we got something meaningful (≥5 words)
-      if (topSentences.split(/\s+/).length >= 5) {
-        return respond(res, 'summarize', topSentences, { method: 'nlp-extractive', mode });
+      // Apply format
+      let topSentences;
+      if (format === 'bullets') {
+        topSentences = extracted.map((s) => `• ${s.trim()}`).join('\n');
+      } else {
+        topSentences = extracted.join(' ');
+      }
+
+      if (topSentences.replace(/•\s*/g, '').trim().split(/\s+/).length >= 5) {
+        return respond(res, 'summarize', topSentences, { method: 'nlp-extractive', mode, format, length });
       }
     }
 

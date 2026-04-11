@@ -2,6 +2,20 @@ import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoadingSpinner from './components/LoadingSpinner';
 import ProtectedRoute from './components/ProtectedRoute';
+import Sidebar from './components/Sidebar';
+
+// Fallback for public pages (no sidebar)
+const PublicFallback = () => <LoadingSpinner withSidebar={false} />;
+
+// Fallback for dashboard pages (with sidebar to prevent layout flash)
+const DashboardFallback = () => (
+  <div className="dashboard-layout">
+    <Sidebar />
+    <main className="dashboard-main">
+      <LoadingSpinner withSidebar={true} />
+    </main>
+  </div>
+);
 
 // Public pages
 const Home   = lazy(() => import('./pages/Home'));
@@ -33,34 +47,32 @@ const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>;
 function App() {
   return (
     <Router>
-      <Suspense fallback={<LoadingSpinner withSidebar={false} />}>
-        <Routes>
-          {/* Public */}
-          <Route path="/"       element={<Home />} />
-          <Route path="/login"  element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+      <Routes>
+        {/* Public — no sidebar fallback */}
+        <Route path="/" element={<Suspense fallback={<PublicFallback />}><Home /></Suspense>} />
+        <Route path="/login"  element={<Suspense fallback={<PublicFallback />}><Login /></Suspense>} />
+        <Route path="/signup" element={<Suspense fallback={<PublicFallback />}><Signup /></Suspense>} />
 
-          {/* Dashboard */}
-          <Route path="/dashboard"         element={<P><Dashboard /></P>} />
-          <Route path="/dashboard/tools"   element={<P><Tools /></P>} />
-          <Route path="/dashboard/history" element={<P><History /></P>} />
-          <Route path="/dashboard/profile" element={<P><Profile /></P>} />
+        {/* Dashboard — sidebar fallback */}
+        <Route path="/dashboard"         element={<P><Suspense fallback={<DashboardFallback />}><Dashboard /></Suspense></P>} />
+        <Route path="/dashboard/tools"   element={<P><Suspense fallback={<DashboardFallback />}><Tools /></Suspense></P>} />
+        <Route path="/dashboard/history" element={<P><Suspense fallback={<DashboardFallback />}><History /></Suspense></P>} />
+        <Route path="/dashboard/profile" element={<P><Suspense fallback={<DashboardFallback />}><Profile /></Suspense></P>} />
 
-          {/* Tool pages */}
-          <Route path="/dashboard/tools/writing-assistant"    element={<P><AIWritingAssistant /></P>} />
-          <Route path="/dashboard/tools/grammar-checker"      element={<P><GrammarChecker /></P>} />
-          <Route path="/dashboard/tools/paraphrasing-tool"    element={<P><ParaphrasingTool /></P>} />
-          <Route path="/dashboard/tools/text-summarizer"      element={<P><TextSummarizer /></P>} />
-          <Route path="/dashboard/tools/tone-analyzer"        element={<P><ToneAnalyzer /></P>} />
-          <Route path="/dashboard/tools/plagiarism-detector"  element={<P><PlagiarismDetector /></P>} />
-          <Route path="/dashboard/tools/citation-generator"   element={<P><CitationGenerator /></P>} />
-          <Route path="/dashboard/tools/word-choice-enhancer" element={<P><WordChoiceEnhancer /></P>} />
-          <Route path="/dashboard/tools/sentence-restructure" element={<P><SentenceRestructure /></P>} />
-          <Route path="/dashboard/tools/readability-score"    element={<P><ReadabilityScore /></P>} />
-          <Route path="/dashboard/tools/vocabulary-builder"   element={<P><VocabularyBuilder /></P>} />
-          <Route path="/dashboard/tools/style-guide"          element={<P><StyleGuide /></P>} />
-        </Routes>
-      </Suspense>
+        {/* Tool pages — sidebar fallback */}
+        <Route path="/dashboard/tools/writing-assistant"    element={<P><Suspense fallback={<DashboardFallback />}><AIWritingAssistant /></Suspense></P>} />
+        <Route path="/dashboard/tools/grammar-checker"      element={<P><Suspense fallback={<DashboardFallback />}><GrammarChecker /></Suspense></P>} />
+        <Route path="/dashboard/tools/paraphrasing-tool"    element={<P><Suspense fallback={<DashboardFallback />}><ParaphrasingTool /></Suspense></P>} />
+        <Route path="/dashboard/tools/text-summarizer"      element={<P><Suspense fallback={<DashboardFallback />}><TextSummarizer /></Suspense></P>} />
+        <Route path="/dashboard/tools/tone-analyzer"        element={<P><Suspense fallback={<DashboardFallback />}><ToneAnalyzer /></Suspense></P>} />
+        <Route path="/dashboard/tools/plagiarism-detector"  element={<P><Suspense fallback={<DashboardFallback />}><PlagiarismDetector /></Suspense></P>} />
+        <Route path="/dashboard/tools/citation-generator"   element={<P><Suspense fallback={<DashboardFallback />}><CitationGenerator /></Suspense></P>} />
+        <Route path="/dashboard/tools/word-choice-enhancer" element={<P><Suspense fallback={<DashboardFallback />}><WordChoiceEnhancer /></Suspense></P>} />
+        <Route path="/dashboard/tools/sentence-restructure" element={<P><Suspense fallback={<DashboardFallback />}><SentenceRestructure /></Suspense></P>} />
+        <Route path="/dashboard/tools/readability-score"    element={<P><Suspense fallback={<DashboardFallback />}><ReadabilityScore /></Suspense></P>} />
+        <Route path="/dashboard/tools/vocabulary-builder"   element={<P><Suspense fallback={<DashboardFallback />}><VocabularyBuilder /></Suspense></P>} />
+        <Route path="/dashboard/tools/style-guide"          element={<P><Suspense fallback={<DashboardFallback />}><StyleGuide /></Suspense></P>} />
+      </Routes>
     </Router>
   );
 }

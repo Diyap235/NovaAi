@@ -413,13 +413,96 @@ const HOMOPHONE_RULES = [
   { p: /\ban ([^aeiouAEIOU\s]\w)/g, f: (m, w) => `a ${w}` },
 ];
 
-// 4. Tense consistency — past time markers with present tense
+// 4. Tense consistency — past time markers with present/base tense verbs
+const PAST_MARKERS = '(yesterday|last\\s+(week|month|year|night|monday|tuesday|wednesday|thursday|friday|saturday|sunday))';
+const PRESENT_TO_PAST = {
+  'go':'went','goes':'went','come':'came','comes':'came',
+  'eat':'ate','eats':'ate','run':'ran','runs':'ran',
+  'see':'saw','sees':'saw','buy':'bought','buys':'bought',
+  'get':'got','gets':'got','take':'took','takes':'took',
+  'make':'made','makes':'made','give':'gave','gives':'gave',
+  'say':'said','says':'said','tell':'told','tells':'told',
+  'find':'found','finds':'found','think':'thought','thinks':'thought',
+  'know':'knew','knows':'knew','leave':'left','leaves':'left',
+  'feel':'felt','feels':'felt','meet':'met','meets':'met',
+  'sit':'sat','sits':'sat','stand':'stood','stands':'stood',
+  'write':'wrote','writes':'wrote','read':'read','reads':'read',
+  'drive':'drove','drives':'drove','fly':'flew','flies':'flew',
+  'swim':'swam','swims':'swam','win':'won','wins':'won',
+  'lose':'lost','loses':'lost','pay':'paid','pays':'paid',
+  'send':'sent','sends':'sent','spend':'spent','spends':'spent',
+  'sleep':'slept','sleeps':'slept','keep':'kept','keeps':'kept',
+  'is':'was','are':'were','am':'was',
+};
+
 const TENSE_RULES = [
-  { p: /\byesterday .{0,30}?\b(is|are|am)\b/gi,
-    f: (m) => m.replace(/\b(is|are|am)\b/gi, (v) => v === 'are' ? 'were' : 'was') },
-  { p: /\blast (week|month|year|night|monday|tuesday|wednesday|thursday|friday|saturday|sunday) .{0,40}?\b(is|are|am)\b/gi,
-    f: (m) => m.replace(/\b(is|are|am)\b/gi, (v) => v === 'are' ? 'were' : 'was') },
+  {
+    p: new RegExp(`\\b${PAST_MARKERS}\\b(.{0,60})`, 'gi'),
+    f: (match) => {
+      return match.replace(/\b(\w+)\b/g, (word) => {
+        const lower = word.toLowerCase();
+        return PRESENT_TO_PAST[lower] || word;
+      });
+    },
+  },
 ];
+
+// 6. Repeated words — "the the", "is is", "that that", etc.
+const fixRepeatedWords = (text, corrections) => {
+  return text.replace(/\b(\w+)\s+\1\b/gi, (match, word) => {
+    corrections.push({ type: 'repeated word', original: match, fixed: word });
+    return word;
+  });
+};
+
+// 7. Extended double negatives — handles both contracted and uncontracted forms
+const DOUBLE_NEGATIVE_RULES = [
+  // with apostrophe
+  { p: /\bdon't know nothing\b/gi,   f: "don't know anything" },
+  { p: /\bdidn't do nothing\b/gi,    f: "didn't do anything" },
+  { p: /\bcan't do nothing\b/gi,     f: "can't do anything" },
+  { p: /\bwon't do nothing\b/gi,     f: "won't do anything" },
+  { p: /\bdon't need nothing\b/gi,   f: "don't need anything" },
+  { p: /\bdidn't see nothing\b/gi,   f: "didn't see anything" },
+  { p: /\bdon't want nothing\b/gi,   f: "don't want anything" },
+  // without apostrophe (common in informal writing)
+  { p: /\bdont know nothing\b/gi,    f: "don't know anything" },
+  { p: /\bdidnt do nothing\b/gi,     f: "didn't do anything" },
+  { p: /\bcant do nothing\b/gi,      f: "can't do anything" },
+  { p: /\bwont do nothing\b/gi,      f: "won't do anything" },
+  { p: /\bdont need nothing\b/gi,    f: "don't need anything" },
+  { p: /\bdidnt see nothing\b/gi,    f: "didn't see anything" },
+  { p: /\bdont want nothing\b/gi,    f: "don't want anything" },
+  // never + nothing
+  { p: /\bnever did nothing\b/gi,    f: "never did anything" },
+  { p: /\bnever said nothing\b/gi,   f: "never said anything" },
+  { p: /\bnobody never\b/gi,         f: "nobody ever" },
+  { p: /\bnothing never\b/gi,        f: "nothing ever" },
+];
+
+// 8. Missing period at end of sentence (if last char is a word char)
+const fixMissingPeriod = (text, corrections) => {
+  const trimmed = text.trimEnd();
+  if (/\w$/.test(trimmed)) {
+    corrections.push({ type: 'missing period', original: '(no period at end)', fixed: '(added period)' });
+    return trimmed + '.';
+  }
+  return text;
+};
+
+// 9. Comma before coordinating conjunctions (FANBOYS) in compound sentences
+const fixConjunctionComma = (text, corrections) => {
+  // Only add comma when conjunction joins two independent clauses (subject on both sides)
+  const before = text;
+  const result = text.replace(
+    /([a-z]{3,})\s+(and|but|or|nor|for|yet|so)\s+([A-Z][a-z]|I\s)/g,
+    (match, left, conj, right) => {
+      corrections.push({ type: 'missing comma', original: match, fixed: `${left}, ${conj} ${right}` });
+      return `${left}, ${conj} ${right}`;
+    }
+  );
+  return result;
+};
 
 // 5. Article fixes — missing "a/an" before adjective+noun combos only
 const ARTICLE_RULES = [
@@ -510,6 +593,13 @@ const fixSubjectVerbAgreement = (text, corrections) => {
       const isThirdPresent = wordLow === presentThird.toLowerCase();
       if (!isInfinitive && !isThirdPresent) continue;
 
+      // Skip imperative/command verbs — if object pronoun follows the verb, it's a command
+      const OBJECT_PRONOUNS = new Set(['it','them','him','her','me','us']);
+
+      // Check if next word is an object pronoun — means this is imperative ("fix it", "help me")
+      const nextWord = (words[i + 1] || '').toLowerCase();
+      if (OBJECT_PRONOUNS.has(nextWord)) continue;
+
       // Find subject — look back up to 5 words
       let subjectWord = null;
       for (let j = i - 1; j >= Math.max(0, i - 5); j--) {
@@ -569,7 +659,9 @@ const fixSubjectVerbAgreement = (text, corrections) => {
  * Step 8 — capitalisation
  */
 const correctGrammar = (text) => {
-  let corrected = text;
+  // Normalize to lowercase first so all rules work regardless of input casing.
+  // fixCapitalisation (Step 8) will restore proper casing at the end.
+  let corrected = text.toLowerCase();
   const corrections = [];
 
   const track = (type, original, fixed) => {
@@ -639,6 +731,23 @@ const correctGrammar = (text) => {
   if (corrected !== beforeCap) {
     corrections.push({ type: 'capitalisation', original: '(lowercase)', fixed: '(capitalised)' });
   }
+
+  // Step 9 — Double negatives (extended)
+  for (const { p, f } of DOUBLE_NEGATIVE_RULES) {
+    corrected = corrected.replace(p, (match) => {
+      track('double negative', match, f);
+      return f;
+    });
+  }
+
+  // Step 10 — Repeated words ("the the", "is is", etc.)
+  corrected = fixRepeatedWords(corrected, corrections);
+
+  // Step 11 — Missing period at end of text
+  corrected = fixMissingPeriod(corrected, corrections);
+
+  // Step 12 — Missing comma before coordinating conjunctions
+  corrected = fixConjunctionComma(corrected, corrections);
 
   return {
     original:   text,

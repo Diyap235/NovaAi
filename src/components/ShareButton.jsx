@@ -13,7 +13,7 @@ function ShareButton({ text, title = 'Nova AI Result', className = '' }) {
       if (navigator.share) {
         await navigator.share({ title, text });
       } else {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(text); // copy result, not URL
       }
       setShared(true);
       setTimeout(() => setShared(false), 2000);

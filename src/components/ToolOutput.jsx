@@ -27,13 +27,13 @@ function ToolOutput({ result, isLoading, error, originalInput = '' }) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
               <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>ORIGINAL</p>
-              <div className="tool-output-text" style={{ background: 'rgba(239,68,68,0.05)', borderRadius: '8px', padding: '1rem' }}>
+              <div className="tool-output-text" style={{ background: 'rgba(239,68,68,0.05)', borderRadius: '8px', padding: '1rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                 {originalInput}
               </div>
             </div>
             <div>
               <p style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>RESULT</p>
-              <div className="tool-output-text" style={{ background: 'rgba(168,85,247,0.05)', borderRadius: '8px', padding: '1rem' }}>
+              <div className="tool-output-text" style={{ background: 'rgba(168,85,247,0.05)', borderRadius: '8px', padding: '1rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                 {result}
               </div>
             </div>
@@ -42,7 +42,7 @@ function ToolOutput({ result, isLoading, error, originalInput = '' }) {
       }
       return (
         <>
-          <div className="tool-output-text">{result}</div>
+          <div className="tool-output-text" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{result}</div>
           <div className="tool-output-footer">
             <CharacterCounter text={result} />
           </div>

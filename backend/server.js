@@ -57,22 +57,26 @@ const startServer = async () => {
     app.use(morgan('dev'));
   }
 
-  // ─── Global rate limiter ──────────────────────────────────────────────────────
-  const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 200,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: { success: false, message: 'Too many requests. Please try again later.' },
-  });
-  app.use(globalLimiter);
+// ─── Global rate limiter ──────────────────────────────────────────────────────
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: process.env.NODE_ENV === 'development' ? 2000 : 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests. Please try again later.' },
+  skip: (req) => req.path === '/', // skip health check
+});
+app.use(globalLimiter);
 
-  // ─── Stricter limiter for AI tool endpoints ───────────────────────────────────
-  const toolLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 20,
-    message: { success: false, message: 'Too many AI requests. Please slow down.' },
-  });
+// ─── Stricter limiter for AI tool endpoints only ──────────────────────────────
+const toolLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: process.env.NODE_ENV === 'development' ? 200 : 20,
+  message: { success: false, message: 'Too many AI requests. Please slow down.' },
+});
+
+// ✅ Make sure this line exists
+app.use('/api/tools', toolLimiter);
 
   // ─── Health check ─────────────────────────────────────────────────────────────
   app.get('/', (req, res) => {
