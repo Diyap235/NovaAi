@@ -4,7 +4,7 @@ const dns = require('dns');
 try {
   dns.setServers(['8.8.8.8', '1.1.1.1']);
 } catch (e) {
-  console.warn('⚠️  Unable to override DNS servers:', e.message);
+  console.warn('  Unable to override DNS servers:', e.message);
 }
 
 const express   = require('express');
