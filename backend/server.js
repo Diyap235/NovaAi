@@ -20,7 +20,7 @@ const toolRoutes    = require('./routes/toolRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 if (!process.env.JWT_SECRET) {
-  console.error('❌  FATAL: JWT_SECRET is not set in .env. Exiting.');
+  console.error(' FATAL: JWT_SECRET is not set in .env. Exiting.');
   process.exit(1);
 }
 if (!process.env.MONGO_URI) {
