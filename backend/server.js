@@ -19,9 +19,9 @@ const draftRoutes   = require('./routes/draftRoutes');
 const toolRoutes    = require('./routes/toolRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
-// ─── Validate critical env vars 
+// ─── Validate critical env vars ───────────────────────────────────────────────
 if (!process.env.JWT_SECRET) {
-  console.error('  FATAL: JWT_SECRET is not set in .env. Exiting.');
+  console.error('❌  FATAL: JWT_SECRET is not set in .env. Exiting.');
   process.exit(1);
 }
 if (!process.env.MONGO_URI) {
@@ -29,7 +29,7 @@ if (!process.env.MONGO_URI) {
   process.exit(1);
 }
 
-// ─── Rate limiters 
+// ─── Rate limiters ────────────────────────────────────────────────────────────
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: process.env.NODE_ENV === 'development' ? 2000 : 500,
@@ -45,7 +45,6 @@ const toolLimiter = rateLimit({
   message: { success: false, message: 'Too many AI requests. Please slow down.' },
 });
 
-// ─── Start ────────────────────────────────────────────────────────────────────
 const startServer = async () => {
   await connectDB();
 
