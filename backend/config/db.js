@@ -6,9 +6,9 @@ const configureDnsForAtlas = () => {
   if (process.env.MONGO_URI?.startsWith('mongodb+srv://')) {
     try {
       dns.setServers(ATLAS_SRV_DNS);
-      console.warn('⚠️  Using fallback DNS servers for MongoDB SRV lookup:', ATLAS_SRV_DNS.join(', '));
+      console.warn('  Using fallback DNS servers for MongoDB SRV lookup:', ATLAS_SRV_DNS.join(', '));
     } catch (dnsError) {
-      console.warn('⚠️  Unable to override DNS servers for MongoDB SRV lookup:', dnsError.message);
+      console.warn('  Unable to override DNS servers for MongoDB SRV lookup:', dnsError.message);
     }
   }
 };
@@ -23,9 +23,9 @@ const connectDB = async () => {
     tlsAllowInvalidCertificates: false,
     serverSelectionTimeoutMS: 10000,
   });
-    console.log(`✅  MongoDB connected: ${conn.connection.host}`);
+    console.log(` MongoDB connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`❌  MongoDB connection error: ${error.message}`);
+    console.error(`  MongoDB connection error: ${error.message}`);
     process.exit(1);
   }
 };
