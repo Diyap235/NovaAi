@@ -1,16 +1,3 @@
-/**
- * promptBuilder.js — Prompt Engineering Layer
- *
- * Builds structured, mode-aware prompts for every AI-powered tool.
- * Each prompt enforces: human-like output, meaning preservation, tone control,
- * and anti-AI-detection patterns.
- *
- * Usage: buildPrompt(type, text, mode)
- *
- * Supported types: paraphrase | grammar | summarize | tone | humanize | enhance
- *                  restructure | readability | vocabulary | style
- * Supported modes: formal | casual | academic | creative
- */
 
 // ─── Mode descriptors injected into prompts ───────────────────────────────────
 const MODE_DESCRIPTORS = {
@@ -32,7 +19,7 @@ const MODE_DESCRIPTORS = {
 const getMode = (mode) =>
   MODE_DESCRIPTORS[(mode || '').toLowerCase()] || MODE_DESCRIPTORS.formal;
 
-// ─── Length instructions ──────────────────────────────────────────────────────
+// ─── Length instructions 
 const LENGTH_INSTRUCTIONS = {
   shorter: 'Make the output noticeably shorter — remove filler, condense sentences, keep only essential content.',
   same:    'Keep the output roughly the same length as the input.',
@@ -48,8 +35,7 @@ Rules:
 - Preserve the original meaning and intent.
 - Vary sentence structure to avoid repetition.`;
 
-// ─── Individual prompt builders ───────────────────────────────────────────────
-
+// ─── Individual prompt builders 
 const prompts = {
   paraphrase: (text, mode) =>
     `Rewrite the following text in a ${getMode(mode)} style. ` +
@@ -134,8 +120,7 @@ const prompts = {
     `\n\nText:\n${text}\n\nStyled Text:`,
 };
 
-// ─── Public API ───────────────────────────────────────────────────────────────
-
+// ─── Public API 
 /**
  * Builds a structured prompt for the given tool type.
  * @param {string} type  - Tool type (e.g. "enhance", "paraphrase")

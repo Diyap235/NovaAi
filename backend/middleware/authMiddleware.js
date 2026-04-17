@@ -1,10 +1,7 @@
 const jwt  = require('jsonwebtoken');
 const User = require('../models/User');
 
-/**
- * Protects routes by verifying the Bearer JWT in the Authorization header.
- * Attaches the authenticated user object to req.user on success.
- */
+
 const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 

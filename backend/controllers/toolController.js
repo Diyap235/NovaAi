@@ -1,27 +1,14 @@
-/**
- * toolController.js — Tool Routing & Orchestration Layer
- *
- * ROUTING LOGIC:
- *   AI Tools (generative)  → promptBuilder → aiService
- *     paraphrase, humanize, enhance, restructure, tone, style
- *
- *   NLP Tools (analytical) → nlpService directly (no AI)
- *     keywordDensity, similarity, sentiment
- *
- *   Hybrid Tools           → NLP first → fallback to AI
- *     summarize, grammar, readability
- */
 
 const aiService       = require('../services/aiService');
 const nlpService      = require('../services/nlpService');
 const { buildPrompt } = require('../utils/promptBuilder');
 
-// ─── Routing classification (exported for docs/testing) ───────────────────────
+// ─── Routing classification (exported for docs/testing) 
 const AI_TOOLS     = ['paraphrase', 'humanize', 'enhance', 'restructure', 'tone', 'style'];
 const NLP_TOOLS    = ['keywordDensity', 'similarity', 'sentiment'];
 const HYBRID_TOOLS = ['summarize', 'grammar', 'readability'];
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Helpers 
 const validateText = (text, res) => {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
     res.status(400).json({ success: false, message: 'text is required and must be a non-empty string.' });
@@ -35,9 +22,7 @@ const validateText = (text, res) => {
 };
 const respond = (res, tool, result, extra = {}) =>
   res.json({ success: true, tool, result, ...extra });
-// ═══════════════════════════════════════════════════════════════════════════════
-// AI TOOLS — Generative: validate → buildPrompt → aiService.generate
-// ═══════════════════════════════════════════════════════════════════════════════
+
 const handleAITool = (toolType) => async (req, res, next) => {
   try {
     const { text, mode = 'formal' } = req.body;
@@ -68,10 +53,6 @@ const enhance = async (req, res, next) => {
   }
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// NLP TOOLS — Analytical: nlpService only, zero AI calls
-// ═══════════════════════════════════════════════════════════════════════════════
-// POST /api/tools/keyword-density  { text }
 const keywordDensity = async (req, res, next) => {
   try {
     const { text } = req.body;
@@ -113,12 +94,6 @@ const sentiment = async (req, res, next) => {
   }
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// HYBRID TOOLS — NLP first, AI fallback
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// POST /api/tools/summarize  { text, mode?, useAI? }
-// DEFAULT: NLP extractive. AI only when useAI=true is explicitly sent.
 const summarize = async (req, res, next) => {
   try {
     const { text, mode = 'formal', useAI = false } = req.body;
@@ -181,10 +156,10 @@ const grammar = async (req, res, next) => {
 
       // Build a human-readable output string
       const lines = [
-        `✅ Corrected Text:`,
+        ` Corrected Text:`,
         `${corrected}`,
         ``,
-        `📋 Corrections Made (${totalFixes}):`,
+        ` Corrections Made (${totalFixes}):`,
       ];
 
       if (corrections.length === 0) {
@@ -196,7 +171,7 @@ const grammar = async (req, res, next) => {
       }
 
       lines.push(``);
-      lines.push(`📊 Readability: ${readScore.grade} (Flesch score: ${readScore.score})`);
+      lines.push(` Readability: ${readScore.grade} (Flesch score: ${readScore.score})`);
       lines.push(`   Avg sentence length: ${readScore.avgSentenceLength} words`);
 
       return respond(res, 'grammar', lines.join('\n'), { method: 'nlp-correction', totalFixes });
@@ -238,7 +213,6 @@ const readability = async (req, res, next) => {
   }
 };
 
-// ─── Extra AI tools ───────────────────────────────────────────────────────────
 
 // POST /api/tools/vocabulary  { text, mode? }
 const vocabulary = handleAITool('vocabulary');
@@ -255,9 +229,6 @@ const wordChoice = async (req, res, next) => {
   }
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// PLAGIARISM DETECTION — Full NLP pipeline (no AI)
-// ═══════════════════════════════════════════════════════════════════════════════
 
 // POST /api/tools/plagiarism  { text }
 plagiarism = async (req, res, next) => {
@@ -321,15 +292,6 @@ INPUT:
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// CITATION GENERATOR — Strict field-based (no NLP, no AI, no text validation)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// POST /api/tools/citation  { style, title, author, year, publisher?, url?, type? }
-//
-// Mode 2 is completely independent from Mode 1.
-// It NEVER calls validateText(). It NEVER checks for inputText.
-// All validation is field-driven inside nlpService.generateCitation().
 const citation = async (req, res, next) => {
   try {
     // Accept fields either flat on the body or nested under `data` (legacy shape)
@@ -362,8 +324,6 @@ const citation = async (req, res, next) => {
     next(err);
   }
 };
-
-// ─── Exports ──────────────────────────────────────────────────────────────────
 
 module.exports = {
   paraphrase, humanize, enhance, restructure, toneRewrite, styleRewrite,

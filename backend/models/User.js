@@ -44,7 +44,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// ─── Hash password before saving ─────────────────────────────────────────────
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(12);
@@ -52,12 +51,10 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// ─── Instance method: compare plain password with hash ───────────────────────
 userSchema.methods.matchPassword = async function (plainPassword) {
   return bcrypt.compare(plainPassword, this.password);
 };
 
-// ─── Remove sensitive fields from JSON output ────────────────────────────────
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;

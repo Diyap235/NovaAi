@@ -2,7 +2,7 @@ const { validationResult } = require('express-validator');
 const User          = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
-// ─── POST /api/auth/signup ────────────────────────────────────────────────────
+// ─── POST /api/auth/signup 
 const signupUser = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -33,7 +33,7 @@ const signupUser = async (req, res, next) => {
   }
 };
 
-// ─── POST /api/auth/login ─────────────────────────────────────────────────────
+// ─── POST /api/auth/login
 const loginUser = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -71,7 +71,7 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-// ─── GET /api/auth/profile ────────────────────────────────────────────────────
+// ─── GET /api/auth/profile 
 const getProfile = async (req, res, next) => {
   try {
     // req.user is attached by the protect middleware
@@ -81,7 +81,7 @@ const getProfile = async (req, res, next) => {
   }
 };
 
-// ─── PUT /api/auth/profile ────────────────────────────────────────────────────
+// ─── PUT /api/auth/profile
 const updateProfile = async (req, res, next) => {
   try {
     const { name, email } = req.body;
@@ -97,7 +97,7 @@ const updateProfile = async (req, res, next) => {
   }
 };
 
-// ─── PUT /api/auth/change-password ───────────────────────────────────────────
+// ─── PUT /api/auth/change-password 
 const changePassword = async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;

@@ -1,7 +1,7 @@
 const Draft = require('../models/Draft');
 const User  = require('../models/User');
 
-// ─── POST /api/drafts/save ────────────────────────────────────────────────────
+// ─── POST /api/drafts/save 
 const saveDraft = async (req, res, next) => {
   try {
     const { toolName, originalText, processedText, metadata } = req.body;
@@ -36,7 +36,7 @@ const saveDraft = async (req, res, next) => {
   }
 };
 
-// ─── GET /api/drafts ──────────────────────────────────────────────────────────
+// ─── GET /api/drafts 
 const getDrafts = async (req, res, next) => {
   try {
     const page     = Math.max(1, parseInt(req.query.page)  || 1);
@@ -74,7 +74,7 @@ const getDrafts = async (req, res, next) => {
   }
 };
 
-// ─── GET /api/drafts/:id ──────────────────────────────────────────────────────
+// ─── GET /api/drafts/:id 
 const getDraftById = async (req, res, next) => {
   try {
     const draft = await Draft.findOne({ _id: req.params.id, userId: req.user._id });
@@ -87,7 +87,7 @@ const getDraftById = async (req, res, next) => {
   }
 };
 
-// ─── DELETE /api/drafts/:id ───────────────────────────────────────────────────
+// ─── DELETE /api/drafts/:id 
 const deleteDraft = async (req, res, next) => {
   try {
     const draft = await Draft.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
@@ -100,7 +100,7 @@ const deleteDraft = async (req, res, next) => {
   }
 };
 
-// ─── DELETE /api/drafts ───────────────────────────────────────────────────────
+// ─── DELETE /api/drafts 
 const deleteAllDrafts = async (req, res, next) => {
   try {
     const { deletedCount } = await Draft.deleteMany({ userId: req.user._id });

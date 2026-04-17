@@ -30,8 +30,7 @@ function test(label, fn) {
   }
 }
 
-// ─── Sample texts ─────────────────────────────────────────────────────────────
-
+// ─── Sample texts 
 const TEXT_SIMPLE   = 'The quick brown fox jumps over the lazy dog near the river bank.';
 const TEXT_ACADEMIC = 'Artificial intelligence is transforming modern industries by automating complex tasks, improving decision-making processes, and enabling new forms of human-computer interaction. Machine learning algorithms analyze vast datasets to identify patterns and generate predictions with remarkable accuracy.';
 const TEXT_NEGATIVE = 'This product is absolutely terrible. The quality is poor, the service was rude, and I completely wasted my money. I am very disappointed and frustrated with this experience.';

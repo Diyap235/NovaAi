@@ -1,8 +1,6 @@
 import { useMemo } from 'react';
 
-/**
- * Displays character and word count for a given text string.
- */
+
 function CharacterCounter({ text = '' }) {
   const charCount = text.length;
   const wordCount = useMemo(

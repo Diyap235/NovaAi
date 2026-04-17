@@ -48,10 +48,8 @@ const draftSchema = new mongoose.Schema(
   }
 );
 
-// ─── Compound index for efficient user history queries ────────────────────────
 draftSchema.index({ userId: 1, createdAt: -1 });
 
-// ─── Text index for search functionality ─────────────────────────────────────
 draftSchema.index({ originalText: 'text', processedText: 'text' });
 
 module.exports = mongoose.model('Draft', draftSchema);

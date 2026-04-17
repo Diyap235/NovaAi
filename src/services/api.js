@@ -1,13 +1,5 @@
-/**
- * Nova AI — Frontend API service
- *
- * Calls the real Node.js backend when VITE_API_URL is set.
- * Falls back to mock responses if the backend is unreachable.
- */
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-// ─── HTTP helper ──────────────────────────────────────────────────────────────
 
 const getToken = () => {
   try {
@@ -33,7 +25,6 @@ const request = async (endpoint, options = {}) => {
   return data;
 };
 
-// ─── Auth ─────────────────────────────────────────────────────────────────────
 
 export const apiSignup = (name, email, password) =>
   request('/auth/signup', { method: 'POST', body: JSON.stringify({ name, email, password }) });
@@ -49,7 +40,6 @@ export const apiUpdateProfile = (updates) =>
 export const apiChangePassword = (currentPassword, newPassword) =>
   request('/auth/change-password', { method: 'PUT', body: JSON.stringify({ currentPassword, newPassword }) });
 
-// ─── Drafts ───────────────────────────────────────────────────────────────────
 
 export const apiSaveDraft = (toolName, originalText, processedText, metadata = {}) =>
   request('/drafts', { method: 'POST', body: JSON.stringify({ toolName, originalText, processedText, metadata }) });
@@ -63,7 +53,6 @@ export const apiDeleteDraft = (id) => request(`/drafts/${id}`, { method: 'DELETE
 
 export const apiDeleteAllDrafts = () => request('/drafts', { method: 'DELETE' });
 
-// ─── AI Tools ─────────────────────────────────────────────────────────────────
 
 // Response shape from backend: { success, tool, result, ...meta }
 const callTool = (endpoint, body) =>

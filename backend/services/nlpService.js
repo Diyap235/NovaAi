@@ -1,23 +1,3 @@
-/**
- * nlpService.js — Local NLP Analytical Layer
- *
- * ROUTING RULE: This service handles ONLY analytical/statistical tasks.
- * NO OpenAI calls here. All processing is deterministic and local.
- *
- * Libraries:
- *   natural    → tokenization, TF-IDF
- *   compromise → POS tagging, text parsing
- *   sentiment  → polarity scoring
- *
- * Exported functions:
- *   tokenize(text)
- *   getKeywordDensity(text)
- *   getSimilarity(text1, text2)
- *   getSentiment(text)
- *   getToneLabel(text)
- *   getPOSTags(text)
- *   getReadabilityScore(text)
- */
 
 const natural   = require('natural');
 const nlp       = require('compromise');
@@ -27,7 +7,7 @@ const tokenizer     = new natural.WordTokenizer();
 const TfIdf         = natural.TfIdf;
 const sentimentAnalyzer = new Sentiment();
 
-// ─── Tokenization ─────────────────────────────────────────────────────────────
+// ─── Tokenization
 
 /**
  * Tokenizes text into lowercase word tokens (punctuation stripped).
@@ -36,7 +16,7 @@ const sentimentAnalyzer = new Sentiment();
  */
 const tokenize = (text) => tokenizer.tokenize(text.toLowerCase());
 
-// ─── Keyword Density ──────────────────────────────────────────────────────────
+// ─── Keyword Density 
 
 // Common English stop words to filter from keyword results
 const STOP_WORDS = new Set([
@@ -78,7 +58,7 @@ const getKeywordDensity = (text) => {
   return { totalWords, keywords };
 };
 
-// ─── TF-IDF + Cosine Similarity ───────────────────────────────────────────────
+// ─── TF-IDF + Cosine Similarity 
 
 /**
  * Builds a TF-IDF term vector for a document relative to a corpus.
@@ -143,8 +123,7 @@ const getSimilarity = (text1, text2) => {
   return { score, label };
 };
 
-// ─── Sentiment Analysis ───────────────────────────────────────────────────────
-
+// ─── Sentiment Analysis 
 /**
  * Performs sentiment polarity analysis.
  * @param {string} text
@@ -167,8 +146,7 @@ const getSentiment = (text) => {
   };
 };
 
-// ─── Tone Detection (NLP-based) ───────────────────────────────────────────────
-
+// ─── Tone Detection (NLP-based) 
 /**
  * Detects basic tone using sentiment + heuristic signals.
  * @param {string} text
@@ -196,8 +174,7 @@ const getToneLabel = (text) => {
   return { tone, confidence, sentiment };
 };
 
-// ─── POS Tagging (compromise) ─────────────────────────────────────────────────
-
+// ─── POS Tagging (compromise) 
 /**
  * Extracts parts-of-speech tags from text.
  * @param {string} text
@@ -213,8 +190,7 @@ const getPOSTags = (text) => {
   };
 };
 
-// ─── Readability Score ────────────────────────────────────────────────────────
-
+// ─── Readability Score 
 /**
  * Calculates a readability score using Flesch Reading Ease formula.
  * @param {string} text
@@ -253,7 +229,7 @@ const getReadabilityScore = (text) => {
   return { score, grade, avgSentenceLength, avgSyllablesPerWord };
 };
 
-// ─── Grammar Correction (comprehensive rule-based NLP) ───────────────────────
+// ─── Grammar Correction (comprehensive rule-based NLP) 
 
 // 1. Irregular verbs — wrong past tense → correct past tense
 const IRREGULAR_VERBS = {
@@ -535,10 +511,7 @@ const fixCapitalisation = (text) => {
   return t;
 };
 
-/**
- * Uses compromise to fix subject-verb agreement dynamically.
- * Works for ANY verb — uses compromise's conjugate() to get correct forms.
- */
+
 const fixSubjectVerbAgreement = (text, corrections) => {
   const THIRD_SINGULAR  = new Set(['she', 'he', 'it']);
   const PLURAL_OR_OTHER = new Set(['they', 'we', 'i', 'you']);
@@ -1148,9 +1121,6 @@ const detectPlagiarism = (inputText) => {
   };
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// CITATION GENERATOR — Strict Rule-Based (NO NLP, NO AI)
-// ═══════════════════════════════════════════════════════════════════════════════
 
 const CITATION_FORMATS = ['APA', 'MLA', 'Chicago', 'Harvard'];
 
@@ -1294,10 +1264,6 @@ const generateCitation = ({ title, author, year, publisher, url, style, type } =
     message: null,
   };
 };
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// WORD CHOICE ENHANCER — NLP-powered (wordpos + natural + compromise)
-// ═══════════════════════════════════════════════════════════════════════════════
 
 const WordPOS = require('wordpos');
 const wordpos = new WordPOS();
@@ -1455,17 +1421,17 @@ const enhanceWordChoice = async (text) => {
   // Build output report
   const lines = [];
 
-  lines.push(`📝 Word Choice Analysis`);
+  lines.push(` Word Choice Analysis`);
   lines.push(`${'─'.repeat(40)}`);
   lines.push(`Total words: ${tokens.length}`);
   lines.push(`Weak/overused words found: ${suggestions.length}`);
   lines.push('');
 
   if (suggestions.length === 0) {
-    lines.push('✅ Great job! No weak or overused words detected.');
+    lines.push(' Great job! No weak or overused words detected.');
     lines.push('   Your word choices are strong and varied.');
   } else {
-    lines.push('⚠️  Suggestions to strengthen your writing:');
+    lines.push('  Suggestions to strengthen your writing:');
     lines.push('');
     suggestions.forEach((s, i) => {
       lines.push(`${i + 1}. "${s.word}" [${s.category}]`);
@@ -1481,14 +1447,14 @@ const enhanceWordChoice = async (text) => {
 
   if (wordposEnrichments.length > 0) {
     lines.push('');
-    lines.push(`📚 WordNet-verified words (wordpos):`);
+    lines.push(` WordNet-verified words (wordpos):`);
     wordposEnrichments.forEach((w) => {
       lines.push(`   • "${w.word}" — confirmed ${w.type}`);
     });
   }
 
   lines.push('');
-  lines.push(`💡 Tip: Replace weak words with the suggested alternatives`);
+  lines.push(` Tip: Replace weak words with the suggested alternatives`);
   lines.push(`   to make your writing more precise and impactful.`);
 
   return lines.join('\n');

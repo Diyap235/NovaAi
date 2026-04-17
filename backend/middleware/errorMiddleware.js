@@ -7,11 +7,6 @@ const notFound = (req, res, next) => {
   next(error);
 };
 
-/**
- * Global error handler.
- * Normalises Mongoose validation errors, cast errors, and duplicate key errors
- * into clean JSON responses. Never leaks stack traces in production.
- */
 const errorHandler = (err, req, res, next) => { // eslint-disable-line no-unused-vars
   let statusCode = res.statusCode !== 200 ? res.statusCode : 500;
   let message    = err.message || 'Internal Server Error';
