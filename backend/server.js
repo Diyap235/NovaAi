@@ -19,17 +19,15 @@ const draftRoutes   = require('./routes/draftRoutes');
 const toolRoutes    = require('./routes/toolRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
-// ─── Validate critical env vars ───────────────────────────────────────────────
 if (!process.env.JWT_SECRET) {
   console.error('❌  FATAL: JWT_SECRET is not set in .env. Exiting.');
   process.exit(1);
 }
 if (!process.env.MONGO_URI) {
-  console.error('❌  FATAL: MONGO_URI is not set in .env. Exiting.');
+  console.error('  FATAL: MONGO_URI is not set in .env. Exiting.');
   process.exit(1);
 }
 
-// ─── Rate limiters ────────────────────────────────────────────────────────────
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: process.env.NODE_ENV === 'development' ? 2000 : 500,
@@ -45,7 +43,6 @@ const toolLimiter = rateLimit({
   message: { success: false, message: 'Too many AI requests. Please slow down.' },
 });
 
-// ─── Start ────────────────────────────────────────────────────────────────────
 const startServer = async () => {
   await connectDB();
 
@@ -82,7 +79,7 @@ const startServer = async () => {
 
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
-    console.log(`🚀  Nova AI server running on port ${PORT} [${process.env.NODE_ENV}]`);
+    console.log(`  Nova AI server running on port ${PORT} [${process.env.NODE_ENV}]`);
   });
 };
 
