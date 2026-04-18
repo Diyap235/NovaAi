@@ -1,27 +1,32 @@
 # NovaAi
 
-NovaAi is a full-stack intelligent writing assistant designed to make text analysis simple, fast, and useful. The idea behind this project was to bring multiple text processing features into one place instead of relying on different tools for different tasks.
+NovaAi is a full-stack intelligent writing assistant designed to make text analysis simple, fast, and actually useful. The main idea behind this project was to bring multiple text processing features into one place instead of relying on different tools for different tasks.
 
-The system takes raw text as input and processes it through a structured NLP pipeline to generate meaningful insights such as summaries, sentiment, keywords, readability score, and similarity detection. The focus of this project is not just on implementing features, but on building a complete working system that is scalable, secure, and easy to use.
+The system takes raw text as input and processes it through a structured NLP pipeline to generate meaningful insights such as summaries, sentiment, keywords, readability score, grammar improvements, and similarity detection. Along with this, advanced AI APIs are integrated to enhance accuracy and provide better contextual understanding.
+
+The focus of this project is not just on implementing features, but on building a complete working system that is scalable, secure, and practical.
 
 ---
 
 ## Why NovaAi?
 
-While working with content, I realized that most tools either do one thing well or give unstructured results. Switching between tools becomes inefficient. NovaAi was built to solve that — a single platform where everything is integrated and results are clear and consistent.
+While working with content, I realized that most tools either focus on one feature or give outputs that are not structured. Switching between tools wastes time and breaks workflow.
+
+NovaAi solves this by combining everything into a single system where results are consistent, structured, and easy to understand.
 
 ---
 
 ## Features
 
-* Text Summarization (extractive)
-* Sentiment Analysis (positive, negative, neutral)
+* Text Summarization (extractive + AI-assisted)
+* Sentiment Analysis (tone detection)
 * Keyword Extraction with density
 * Readability Score (Flesch-based)
-* Grammar Checking (basic rule-based)
+* Grammar Checking (rule-based + AI support)
 * Vocabulary Enhancement suggestions
 * Style consistency suggestions
 * Similarity / plagiarism detection (TF-IDF + cosine)
+* AI-powered sentence improvement (API-based)
 
 ---
 
@@ -40,10 +45,15 @@ Database:
 
 * MongoDB
 
-NLP:
+NLP (Local Processing):
 
 * compromise (tokenization, parsing)
 * natural (TF-IDF, similarity)
+
+AI Integration:
+
+* OpenAI API (text improvement, restructuring, advanced suggestions)
+* Groq API (fast inference for AI-based processing)
 
 Security:
 
@@ -54,12 +64,15 @@ Security:
 
 ## How It Works
 
-1. User enters text in the frontend (React UI)
+1. User enters text in the React interface
 2. Request is sent to backend via API
-3. Backend processes text using NLP pipeline:
-   tokenization → analysis → feature modules
-4. Results are generated in structured format
-5. Output is displayed to the user
+3. Backend processes text through:
+
+   * NLP pipeline (local processing)
+   * AI APIs (for advanced enhancements)
+4. Modules run:
+   tokenization → sentiment → keywords → readability → summary → similarity → AI enhancement
+5. Structured output is returned and displayed
 
 ---
 
@@ -70,58 +83,64 @@ Security:
 /routes
 /controllers
 /models
-/utils (NLP logic)
+/utils (NLP + API logic)
 
 ---
 
 ## Setup Instructions
 
 1. Clone the repository
-   git clone 
+   git clone <your-repo-link>
 
 2. Install dependencies
    npm install
 
-3. Start backend
-   node server.js
-
-4. Start frontend
-   npm start
-
-5. Add environment variables (.env)
+3. Add environment variables (.env)
    MONGO_URI=your_db
    JWT_SECRET=your_secret
+   OPENAI_API_KEY=your_key
+   GROQ_API_KEY=your_key
+
+4. Start backend
+   node server.js
+
+5. Start frontend
+   npm start
 
 ---
 
 ## Challenges Faced
 
-* Integrating multiple NLP features into one pipeline
-* Managing large text efficiently
-* Maintaining performance while adding features
+* Integrating multiple NLP modules into one pipeline
+* Managing balance between local processing and API usage
+* Handling large text efficiently
+* Maintaining performance with AI API calls
 * Ensuring smooth frontend-backend communication
 
 ---
 
 ## What I Learned
 
-This project helped me understand how real-world applications are built. It was not just about coding features, but about connecting everything properly — frontend, backend, database, and logic. I also got hands-on experience with NLP concepts and API design.
+This project helped me understand how real-world systems are built end-to-end. It was not just about implementing features, but about designing flow, handling APIs, managing data, and keeping everything connected.
+
+I also learned how to combine traditional NLP techniques with modern AI APIs to build a more powerful system.
 
 ---
 
 ## Future Improvements
 
-* Add advanced models like BERT/GPT
-* Support multiple languages
-* Improve grammar and style suggestions
+* Add advanced transformer-based models (BERT/GPT fine-tuning)
+* Improve AI-based grammar and style suggestions
+* Add multilingual support
+* Optimize API usage and cost
 * Deploy on cloud (AWS)
-* Convert into a SaaS product
+* Convert into a SaaS platform
 
 ---
 
 ## Final Note
 
-NovaAi is built as a practical system, not just a demo project. The goal was to create something that actually works end-to-end and can be extended further.
+NovaAi is not just a feature-based project. It is built as a system that combines NLP and AI into a single workflow. The goal was to make something practical that can actually be extended further.
 
 ---
 
