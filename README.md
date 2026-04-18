@@ -87,27 +87,6 @@ Security:
 
 ---
 
-## Setup Instructions
-
-1. Clone the repository
-   git clone <your-repo-link>
-
-2. Install dependencies
-   npm install
-
-3. Add environment variables (.env)
-   MONGO_URI=your_db
-   JWT_SECRET=your_secret
-   OPENAI_API_KEY=your_key
-   GROQ_API_KEY=your_key
-
-4. Start backend
-   node server.js
-
-5. Start frontend
-   npm start
-
----
 
 ## Challenges Faced
 
