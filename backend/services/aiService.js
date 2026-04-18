@@ -1,9 +1,17 @@
+/**
+ * aiService.js — Generative AI Layer (Groq)
+ *
+ * Uses Groq's API with llama-3.3-70b-versatile model.
+ * Drop-in replacement for OpenAI — same interface, much faster, free tier available.
+ *
+ * ROUTING RULE: Only called for generative tasks:
+ *   paraphrase | humanize | enhance | restructure | tone | style | grammar (AI) | summarize (AI)
+ */
 
 const Groq = require('groq-sdk');
 
-let _client;
-
-// ─── Client (lazy init)
+// ─── Client (lazy init) ───────────────────────────────────────────────────────
+let _client = null;
 const getClient = () => {
   if (!_client) {
     if (!process.env.GROQ_API_KEY) throw new Error('GROQ_API_KEY is not set in environment.');
@@ -12,7 +20,7 @@ const getClient = () => {
   return _client;
 };
 
-// ─── System prompt 
+// ─── System prompt ────────────────────────────────────────────────────────────
 const SYSTEM_PROMPT =
   'You are a professional human writer with expertise in linguistics and creative writing. ' +
   'Rewrite and generate text that is natural, fluent, and contextually accurate. ' +
@@ -20,7 +28,8 @@ const SYSTEM_PROMPT =
   'Maintain the original meaning while improving clarity, flow, and human authenticity. ' +
   'Never add disclaimers, meta-commentary, or explain what you are doing — just output the result.';
 
-// ─── Core generation function 
+// ─── Core generation function ─────────────────────────────────────────────────
+
 /**
  * @param {string} prompt       - Full structured prompt from promptBuilder
  * @param {object} [options]    - Override default model params
