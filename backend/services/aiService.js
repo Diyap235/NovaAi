@@ -1,6 +1,7 @@
 
-
 const Groq = require('groq-sdk');
+
+let _client;
 
 // ─── Client (lazy init)
 const getClient = () => {
